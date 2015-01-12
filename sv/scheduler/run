@@ -1,0 +1,9 @@
+#!/bin/sh
+
+sv start etcd || exit 1
+
+KUBE_SCHEDULER_OPTS="--logtostderr=true \
+--master=127.0.0.1:8080"
+
+exec 2>&1
+exec kube-scheduler ${KUBE_SCHEDULER_OPTS}

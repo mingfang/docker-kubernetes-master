@@ -1,0 +1,4 @@
+alias pods='kubectl get pods'
+alias replicationcontrollers='kubectl get replicationcontrollers'
+alias services='kubectl get services'
+alias nodes='kubectl get nodes'

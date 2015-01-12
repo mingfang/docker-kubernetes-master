@@ -1,0 +1,10 @@
+#!/bin/sh
+
+sv start etcd || exit 1
+
+KUBE_CONTROLLER_MANAGER_OPTS="--master=127.0.0.1:8080 \
+--machines=minux \
+--logtostderr=true"
+
+exec 2>&1
+exec kube-controller-manager ${KUBE_CONTROLLER_MANAGER_OPTS}
