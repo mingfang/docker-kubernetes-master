@@ -1,1 +1,1 @@
-docker run -p 4001:4001 -p 8080:8080 -v `pwd`:/docker -w /docker --rm -i -t kubernetes-master /bin/bash
+docker run -p 53:53/udp -p 4001:4001 -p 8080:8080 -v `pwd`:/docker -w /docker --rm -i -t kubernetes-master /bin/bash
