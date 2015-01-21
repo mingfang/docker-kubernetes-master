@@ -3,6 +3,7 @@
 sv start etcd || exit 1
 
 KUBE_APISERVER_OPTS="--address=0.0.0.0 \
+--cors_allowed_origins=.* \
 --port=8080 \
 --etcd_servers=http://127.0.0.1:4001 \
 --logtostderr=true \
