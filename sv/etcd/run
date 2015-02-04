@@ -2,5 +2,7 @@
 
 #sv start socklog-unix || exit 1
 
+ETCD_OPTS="-listen-client-urls=http://0.0.0.0:4001"
+
 exec 2>&1
-exec etcd
+exec etcd ${ETCD_OPTS}
