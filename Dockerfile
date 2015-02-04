@@ -14,13 +14,13 @@ RUN echo 'export > /etc/envvars' >> /root/.bashrc
 RUN apt-get install -y vim less net-tools inetutils-ping wget curl git telnet nmap socat dnsutils netcat tree htop unzip sudo software-properties-common
 
 #Etcd
-RUN curl -L https://github.com/coreos/etcd/releases/download/v0.4.6/etcd-v0.4.6-linux-amd64.tar.gz | tar zx
+RUN curl -L https://github.com/coreos/etcd/releases/download/v2.0.0/etcd-v2.0.0-linux-amd64.tar.gz | tar zx
 RUN mv /etcd* /etcd && \
     ln -s /etcd/etcd /usr/local/bin/etcd && \
     ln -s /etcd/etcdctl /usr/local/bin/etcdctl
 
 #Kubernetes
-RUN curl -L https://github.com/GoogleCloudPlatform/kubernetes/releases/download/v0.9.0/kubernetes.tar.gz | tar zx
+RUN curl -L https://github.com/GoogleCloudPlatform/kubernetes/releases/download/v0.9.3/kubernetes.tar.gz | tar zx
 RUN tar -xvf /kubernetes/server/kubernetes-server-linux-amd64.tar.gz --strip-components 3 -C /usr/local/bin 
 
 #Required to build SkyDNS
