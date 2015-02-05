@@ -20,7 +20,7 @@ RUN mv /etcd* /etcd && \
     ln -s /etcd/etcdctl /usr/local/bin/etcdctl
 
 #Kubernetes
-RUN curl -L https://github.com/GoogleCloudPlatform/kubernetes/releases/download/v0.9.3/kubernetes.tar.gz | tar zx
+RUN curl -L https://github.com/GoogleCloudPlatform/kubernetes/releases/download/v0.10.0/kubernetes.tar.gz | tar zx
 RUN tar -xvf /kubernetes/server/kubernetes-server-linux-amd64.tar.gz --strip-components 3 -C /usr/local/bin 
 
 #Required to build SkyDNS
@@ -28,10 +28,10 @@ RUN apt-get install -y mercurial golang-go
 ENV GOPATH /tmp
 
 #SkyDNS
-RUN go get github.com/skynetservices/skydns && \
-    cd $GOPATH/src/github.com/skynetservices/skydns && \
-    go build -v && \
-    mv skydns /usr/local/bin
+#RUN go get github.com/skynetservices/skydns && \
+#    cd $GOPATH/src/github.com/skynetservices/skydns && \
+#    go build -v && \
+#    mv skydns /usr/local/bin
 
 #Aliases
 ADD aliases /root/.aliases

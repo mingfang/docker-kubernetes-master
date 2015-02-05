@@ -6,4 +6,6 @@ source /etc/envvars
 env
 
 exec 2>&1
-exec skydns -kubernetes -addr="0.0.0.0:53" -master="http://127.0.0.1:8080"
+#exec skydns -kubernetes -addr="0.0.0.0:53" -master="http://127.0.0.1:8080"
+#disable until skydns is compatible again
+exec sleep infinity
