@@ -7,6 +7,6 @@ Use ```./build``` to build the Docker image.
 
 Use ```./run``` to run the container.
 
-Test DNS by running ```dig kubernetes.skydns.local @localhost```
+~~Test DNS by running ```dig kubernetes.skydns.local @localhost```~~ Latest SkyDNS removed Kubernetes support.
 
 The companion Dockerfile to run Nodes is here [https://github.com/mingfang/docker-kubernetes-node]
