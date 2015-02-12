@@ -1,12 +1,10 @@
 # docker-kubernetes-master
 Runs Kubernetes Master Inside Docker
 
-Includes apiserver, controller-manager, scheduler, etcd and SkyDNS.
+Includes apiserver, controller-manager, scheduler, and etcd.
 
 Use ```./build``` to build the Docker image.
 
 Use ```./run``` to run the container.
-
-~~Test DNS by running ```dig kubernetes.skydns.local @localhost```~~ Latest SkyDNS removed Kubernetes support.
 
 The companion Dockerfile to run Nodes is here [https://github.com/mingfang/docker-kubernetes-node]
