@@ -20,7 +20,7 @@ RUN mv /etcd* /etcd && \
     ln -s /etcd/etcdctl /usr/local/bin/etcdctl
 
 #Kubernetes
-RUN wget -O - https://github.com/GoogleCloudPlatform/kubernetes/releases/download/v0.13.0/kubernetes.tar.gz | tar zx
+RUN wget -O - https://github.com/GoogleCloudPlatform/kubernetes/releases/download/v0.13.2/kubernetes.tar.gz | tar zx
 RUN tar -xvf /kubernetes/server/kubernetes-server-linux-amd64.tar.gz --strip-components 3 -C /usr/local/bin 
 
 #Aliases
