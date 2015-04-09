@@ -3,7 +3,7 @@
 #sv start socklog-unix || exit 1
 
 IP=`ip route get 1 | awk '{print $NF;exit}'`
-ETCD_OPTS="-listen-client-urls=http://0.0.0.0:4001 -addr=$IP:4001"
+ETCD_OPTS="-addr=$IP:4001"
 
 exec 2>&1
 exec etcd ${ETCD_OPTS}
