@@ -21,11 +21,11 @@ RUN mv /etcd* /etcd && \
     ln -s /etcd/etcdctl /usr/local/bin/etcdctl
 
 #Kubernetes
-RUN wget -O - https://github.com/GoogleCloudPlatform/kubernetes/releases/download/v0.20.2/kubernetes.tar.gz | tar zx
+RUN wget -O - https://github.com/GoogleCloudPlatform/kubernetes/releases/download/v1.0.1/kubernetes.tar.gz | tar zx
 RUN tar -xvf /kubernetes/server/kubernetes-server-linux-amd64.tar.gz --strip-components 3 -C /usr/local/bin 
 
 #Node
-RUN wget -O - http://nodejs.org/dist/v0.12.5/node-v0.12.5-linux-x64.tar.gz | tar xz
+RUN wget -O - http://nodejs.org/dist/v0.12.7/node-v0.12.7-linux-x64.tar.gz | tar xz
 RUN mv node* node && \
     ln -s /node/bin/node /usr/local/bin/node && \
     ln -s /node/bin/npm /usr/local/bin/npm
