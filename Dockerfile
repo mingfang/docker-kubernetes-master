@@ -19,6 +19,7 @@ RUN wget -O - https://github.com/coreos/etcd/releases/download/v2.0.13/etcd-v2.0
 RUN mv /etcd* /etcd && \
     ln -s /etcd/etcd /usr/local/bin/etcd && \
     ln -s /etcd/etcdctl /usr/local/bin/etcdctl
+RUN mkdir -p /var/lib/etcd-data
 
 #Kubernetes
 RUN wget -O - https://github.com/GoogleCloudPlatform/kubernetes/releases/download/v1.0.1/kubernetes.tar.gz | tar zx
