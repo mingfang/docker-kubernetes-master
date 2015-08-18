@@ -22,7 +22,7 @@ RUN mv /etcd* /etcd && \
 RUN mkdir -p /var/lib/etcd-data
 
 #Kubernetes
-RUN wget -O - https://github.com/GoogleCloudPlatform/kubernetes/releases/download/v1.0.1/kubernetes.tar.gz | tar zx
+RUN wget -O - https://github.com/GoogleCloudPlatform/kubernetes/releases/download/v1.0.3/kubernetes.tar.gz | tar zx
 RUN tar -xvf /kubernetes/server/kubernetes-server-linux-amd64.tar.gz --strip-components 3 -C /usr/local/bin 
 
 #Node
