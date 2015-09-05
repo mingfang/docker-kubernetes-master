@@ -1,2 +1,3 @@
+etcd-data/
 .git
 **/node_modules
