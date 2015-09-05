@@ -2,7 +2,8 @@
 
 #sv start socklog-unix || exit 1
 
-ETCD_OPTS="-advertise-client-urls=http://0.0.0.0:4001 -listen-client-urls=http://0.0.0.0:4001 -data-dir=/var/lib/etcd-data"
+ADVERTISE_CLIENT_URLS=$(line='http://127.0.0.1:4001'; for x in `ip route | grep -Po '(?<=src )(\d{1,3}.){4}'`; do line="$line,http://$x:4001"; done; echo $line)
+ETCD_OPTS="-advertise-client-urls=${ADVERTISE_CLIENT_URLS} -listen-client-urls=http://0.0.0.0:4001 -data-dir=/var/lib/etcd-data"
 
 exec 2>&1
 exec etcd ${ETCD_OPTS}
