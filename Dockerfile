@@ -33,15 +33,18 @@ RUN mv node* node && \
 ENV NODE_PATH /usr/local/lib/node_modules
 
 #cmdgateway
-ADD cmdgateway/package.json /cmdgateway/package.json
+COPY cmdgateway/package.json /cmdgateway/package.json
 RUN cd /cmdgateway && \
     npm install
-ADD cmdgateway /cmdgateway
+COPY cmdgateway /cmdgateway
 
 #Aliases
-ADD aliases /root/.aliases
+COPY aliases /root/.aliases
 RUN echo "source ~/.aliases" >> /root/.bashrc
 
+#Scheduler Policy
+COPY scheduler-policy.json /etc/
+
 #Add runit services
-ADD sv /etc/service 
+COPY sv /etc/service 
 

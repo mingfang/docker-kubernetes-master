@@ -1,9 +1,17 @@
-#!/bin/sh
+#!/bin/bash
 
-sv start etcd || exit 1
+sv apiserver etcd || exit 1
 
-KUBE_SCHEDULER_OPTS="--logtostderr=true \
---master=127.0.0.1:8080"
+source /etc/envvars
+env
+
+:${SCHEDULER_POLICY_FILE="/etc/scheduler-policy.json"}
+
+KUBE_SCHEDULER_OPTS="\
+  --logtostderr=true \
+  --master=127.0.0.1:8080 \
+  --policy-config-file=${SCHEDULER_POLICY_FILE} \
+  --v=2"
 
 exec 2>&1
 exec kube-scheduler ${KUBE_SCHEDULER_OPTS}
