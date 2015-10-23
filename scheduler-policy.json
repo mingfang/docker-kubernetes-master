@@ -2,7 +2,6 @@
 "kind" : "Policy",
 "apiVersion" : "v1",
 "predicates" : [
-	{"name" : "RegionZoneAffinity", "argument" : {"serviceAffinity" : {"labels" : ["region", "zone"]}}},
 	{"name" : "PodFitsPorts"},
 	{"name" : "PodFitsResources"},
 	{"name" : "NoDiskConflict"},
@@ -12,6 +11,6 @@
 "priorities" : [
 	{"name" : "LeastRequestedPriority", "weight" : 1},
 	{"name" : "BalancedResourceAllocation", "weight" : 1},
-	{"name" : "ServiceSpreadingPriority", "weight" : 1}
+	{"name" : "ServiceSpreadingPriority", "weight" : 10}
 ]
 }
