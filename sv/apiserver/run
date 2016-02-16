@@ -10,7 +10,8 @@ KUBE_APISERVER_OPTS="--address=0.0.0.0 \
 --etcd_servers=http://127.0.0.1:4001 \
 --logtostderr=true \
 --v=2 \
---portal_net=10.1.1.0/24"
+--portal_net=10.1.1.0/24 \
+--runtime-config=extensions/v1beta1/daemonsets=true"
 
 env
 exec 2>&1
