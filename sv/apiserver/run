@@ -11,6 +11,7 @@ KUBE_APISERVER_OPTS="--insecure-bind-address=0.0.0.0 \
 --logtostderr=true \
 --v=1 \
 --service-cluster-ip-range=172.27.0.0/16 \
+--admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,ResourceQuota \
 --runtime-config=extensions/v1beta1/daemonsets=true"
 
 env
