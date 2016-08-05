@@ -23,9 +23,11 @@ RUN mv /etcd* /etcd && \
 RUN mkdir -p /var/lib/etcd-data
 
 #Kubernetes
-RUN wget -O - https://github.com/kubernetes/kubernetes/releases/download/v1.3.4/kubernetes.tar.gz | tar zx && \
-    tar -xvf /kubernetes/server/kubernetes-server-linux-amd64.tar.gz --strip-components 3 -C /usr/local/bin  && \
-    rm -rf /kubernetes
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.3.4/bin/linux/amd64/kube-apiserver
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.3.4/bin/linux/amd64/kube-controller-manager
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.3.4/bin/linux/amd64/kube-scheduler
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.3.4/bin/linux/amd64/kubectl
+RUN chmod +x /usr/local/bin/kube*
 
 #Aliases
 COPY aliases /root/.aliases
