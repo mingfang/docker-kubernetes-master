@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 #sv start socklog-unix || exit 1
 
