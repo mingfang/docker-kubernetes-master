@@ -29,9 +29,13 @@ RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/rel
 RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.4.6/bin/linux/amd64/kubectl
 RUN chmod +x /usr/local/bin/kube*
 
-#Aliases
-COPY aliases /root/.aliases
-RUN echo "source ~/.aliases" >> /root/.bashrc
+#Influxdb
+RUN wget https://dl.influxdata.com/influxdb/releases/influxdb_1.1.0_amd64.deb && \
+    dpkg -i influxdb*.deb && \
+    rm influxdb*.deb
+
+#Heapster
+COPY heapster /heapster
 
 #Scheduler Policy
 COPY scheduler-policy.json /etc/

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: heapster
+  namespace: kube-system
+  labels:
+    task: monitoring
+    kubernetes.io/cluster-service: 'false'
+    kubernetes.io/name: Heapster
+spec:
+  clusterIP: None
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8082
