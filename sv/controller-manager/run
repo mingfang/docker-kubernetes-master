@@ -1,10 +1,15 @@
-#!/bin/sh
+#!/bin/bash
 
 sv start etcd || exit 1
 
-KUBE_CONTROLLER_MANAGER_OPTS="--master=127.0.0.1:8080 \
+source /etc/envvars
+
+KUBE_CONTROLLER_MANAGER_OPTS="\
+--master=127.0.0.1:8080 \
 --pod-eviction-timeout=300s \
---logtostderr=true"
+--logtostderr=true \
+--service-account-private-key-file=${SERVICE_ACCOUNT_KEY} \
+"
 
 exec 2>&1
 exec kube-controller-manager ${KUBE_CONTROLLER_MANAGER_OPTS}

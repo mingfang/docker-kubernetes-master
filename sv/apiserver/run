@@ -4,15 +4,18 @@ sv start etcd || exit 1
 
 source /etc/envvars
 
-KUBE_APISERVER_OPTS="--insecure-bind-address=0.0.0.0 \
+KUBE_APISERVER_OPTS="\
+--insecure-bind-address=0.0.0.0 \
 --insecure-port=8080 \
 --etcd_servers=http://127.0.0.1:4001 \
 --logtostderr=true \
 --v=1 \
 --service-cluster-ip-range=172.27.0.0/16 \
---admission-control=NamespaceLifecycle,LimitRanger,ResourceQuota \
+--admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota \
 --allow-privileged=true \
---runtime-config=extensions/v1beta1/daemonsets=true"
+--runtime-config=extensions/v1beta1/daemonsets=true,extensions/v1beta1/deployments=true \
+--service-account-key-file=${SERVICE_ACCOUNT_KEY} \
+"
 
 env
 exec 2>&1
