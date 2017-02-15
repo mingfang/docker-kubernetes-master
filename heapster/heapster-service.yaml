@@ -8,7 +8,8 @@ metadata:
     kubernetes.io/cluster-service: 'false'
     kubernetes.io/name: Heapster
 spec:
-  clusterIP: None
+  selector:
+    name: heapster
   ports:
   - port: 80
     protocol: TCP
