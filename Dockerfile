@@ -31,7 +31,7 @@ RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/rel
 RUN chmod +x /usr/local/bin/kube*
 
 #Influxdb
-RUN wget https://dl.influxdata.com/influxdb/releases/influxdb_1.1.0_amd64.deb && \
+RUN wget https://dl.influxdata.com/influxdb/releases/influxdb_1.2.0_amd64.deb && \
     dpkg -i influxdb*.deb && \
     rm influxdb*.deb
 
