@@ -6,9 +6,11 @@ source /etc/envvars
 
 KUBE_CONTROLLER_MANAGER_OPTS="\
 --master=127.0.0.1:8080 \
+--node-monitor-grace-period=20s \
 --pod-eviction-timeout=300s \
 --logtostderr=true \
---service-account-private-key-file=${SERVICE_ACCOUNT_KEY} \
+--root-ca-file=/srv/kubernetes/ca.crt \
+--service-account-private-key-file=/srv/kubernetes/server.key \
 "
 
 exec 2>&1
