@@ -17,17 +17,17 @@ RUN echo "alias tcurrent='tail /var/log/*/current -f'" | tee -a /root/.bashrc /e
 RUN apt-get install -y --no-install-recommends vim less net-tools inetutils-ping wget curl git telnet nmap socat dnsutils netcat tree htop unzip sudo software-properties-common jq psmisc iproute python ssh rsync
 
 #Etcd
-RUN wget -O - https://github.com/coreos/etcd/releases/download/v3.1.4/etcd-v3.1.4-linux-amd64.tar.gz | tar zx
+RUN wget -O - https://github.com/coreos/etcd/releases/download/v3.1.5/etcd-v3.1.5-linux-amd64.tar.gz | tar zx
 RUN mv /etcd* /etcd && \
     ln -s /etcd/etcd /usr/local/bin/etcd && \
     ln -s /etcd/etcdctl /usr/local/bin/etcdctl
 RUN mkdir -p /var/lib/etcd-data
 
 #Kubernetes
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.5.5/bin/linux/amd64/kube-apiserver
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.5.5/bin/linux/amd64/kube-controller-manager
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.5.5/bin/linux/amd64/kube-scheduler
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.5.5/bin/linux/amd64/kubectl
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.6.0/bin/linux/amd64/kube-apiserver
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.6.0/bin/linux/amd64/kube-controller-manager
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.6.0/bin/linux/amd64/kube-scheduler
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.6.0/bin/linux/amd64/kubectl
 RUN chmod +x /usr/local/bin/kube*
 
 #Influxdb
