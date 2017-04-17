@@ -38,11 +38,12 @@ RUN wget https://dl.influxdata.com/influxdb/releases/influxdb_1.2.2_amd64.deb &&
 
 #Security
 RUN mkdir -p /srv/kubernetes
-RUN openssl genrsa -out /srv/kubernetes/ca.key 4096 && \
-    openssl req -x509 -new -nodes -key /srv/kubernetes/ca.key -subj "/CN=*/" -days 10000 -out /srv/kubernetes/ca.crt && \
+COPY openssl.cnf /srv/kubernetes/
+RUN openssl genrsa -out /srv/kubernetes/ca.key 2048 && \
+    openssl req -x509 -new -nodes -key /srv/kubernetes/ca.key -subj "/CN=kube-ca" -days 10000 -out /srv/kubernetes/ca.crt && \
     openssl genrsa -out /srv/kubernetes/server.key 2048 && \
-    openssl req -new -key /srv/kubernetes/server.key -subj "/CN=*/" -out /srv/kubernetes/server.csr && \
-    openssl x509 -req -in /srv/kubernetes/server.csr -CA /srv/kubernetes/ca.crt -CAkey /srv/kubernetes/ca.key -CAcreateserial -out /srv/kubernetes/server.crt -days 10000
+    openssl req -new -key /srv/kubernetes/server.key -subj "/CN=kube-apiserver" -out /srv/kubernetes/server.csr -config /srv/kubernetes/openssl.cnf && \
+    openssl x509 -req -in /srv/kubernetes/server.csr -CA /srv/kubernetes/ca.crt -CAkey /srv/kubernetes/ca.key -CAcreateserial -out /srv/kubernetes/server.crt -days 10000 -extensions v3_req -extfile /srv/kubernetes/openssl.cnf
 RUN TOKEN=$(dd if=/dev/urandom bs=128 count=1 2>/dev/null | base64 | tr -d "=+/" | dd bs=32 count=1 2>/dev/null) && \
     mkdir -p /srv/kube-apiserver && \
     echo "${TOKEN},kubelet,kubelet" > /srv/kube-apiserver/known_tokens.csv
