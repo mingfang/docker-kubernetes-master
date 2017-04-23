@@ -1,6 +1,6 @@
 #!/bin/bash
 source helper
 
-docker run -v `pwd`:/docker --entrypoint sh gcr.io/google_containers/heapster:v1.3.0 -c "cp /heapster /docker/heapster/"
+docker run -v `pwd`:/docker --entrypoint sh gcr.io/google_containers/heapster:v1.2.0 -c "cp /heapster /docker/heapster/"
 
 docker build --pull --build-arg http_proxy="$http_proxy" --build-arg https_proxy="$https_proxy" $@ -t ${IMAGE} . 
