@@ -18,6 +18,7 @@ KUBE_APISERVER_OPTS="\
 --client-ca-file=/srv/kubernetes/ca.crt \
 --tls-cert-file=/srv/kubernetes/server.crt \
 --tls-private-key-file=/srv/kubernetes/server.key \
+--service-account-key-file=/srv/kubernetes/service-account.key \
 --token_auth_file=/srv/kube-apiserver/known_tokens.csv \
 --storage-backend=etcd2 \
 --storage-media-type=application/json \
