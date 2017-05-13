@@ -1,1 +1,2 @@
-docker run -e KUBE_ENABLE_DAEMONSETS=true -e KUBE_ENABLE_DEPLOYMENTS=true -v `pwd`/etcd-data:/var/lib/etcd-data --net=host -p 4001:4001 -p 8080:8080 -v /var/log:/var/log -d kubernetes-master
+docker rm -f kmaster
+docker run --name kmaster -v `pwd`/etcd-data:/var/lib/etcd-data --net=host -p 4001:4001 -p 8080:8080 -v /var/log:/var/log -d kubernetes-master
