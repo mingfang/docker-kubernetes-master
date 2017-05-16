@@ -51,6 +51,7 @@ RUN TOKEN=$(dd if=/dev/urandom bs=128 count=1 2>/dev/null | base64 | tr -d "=+/"
 
 #Heapster
 COPY heapster /heapster
+COPY --from=gcr.io/google_containers/heapster:v1.3.0 heapster /heapster/heapster
 
 #Scheduler Policy
 COPY scheduler-policy.json /etc/
