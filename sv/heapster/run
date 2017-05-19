@@ -17,4 +17,4 @@ kubectl --namespace=kube-system delete endpoints heapster
 kubectl apply -f heapster-endpoint.yaml
 
 exec 2>&1
-exec ./heapster --source=kubernetes:http://localhost:8080?inClusterConfig=false --sink=influxdb:http://localhost:8086
+exec ./heapster --source=kubernetes.summary_api:http://localhost:8080?inClusterConfig=false --sink=influxdb:http://localhost:8086
