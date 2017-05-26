@@ -12,9 +12,9 @@ KUBE_APISERVER_OPTS="\
 --logtostderr=true \
 --v=1 \
 --service-cluster-ip-range=172.27.0.0/16 \
---admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota \
+--admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,PersistentVolumeLabel,DefaultStorageClass,ResourceQuota,DefaultTolerationSeconds,PodPreset \
 --allow-privileged=true \
---runtime-config=extensions/v1beta1/daemonsets=true,extensions/v1beta1/deployments=true,extensions/v1beta1/networkpolicies=true \
+--runtime-config=api/all \
 --client-ca-file=/srv/kubernetes/ca.crt \
 --tls-cert-file=/srv/kubernetes/server.crt \
 --tls-private-key-file=/srv/kubernetes/server.key \
