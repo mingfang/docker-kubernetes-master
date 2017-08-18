@@ -1,14 +1,13 @@
 FROM ubuntu:16.04 as base
 
-ENV DEBIAN_FRONTEND=noninteractive \
-    LANG=en_US.UTF-8 \
-    TERM=xterm
+ENV DEBIAN_FRONTEND=noninteractive TERM=xterm
 RUN echo "export > /etc/envvars" >> /root/.bashrc && \
-    echo "export PS1='\[\e[1;31m\]\u@\h:\w\\$\[\e[0m\] '" | tee -a /root/.bashrc /etc/bash.bashrc && \
-    echo "alias tcurrent='tail /var/log/*/current -f'" | tee -a /root/.bashrc /etc/bash.bashrc
+    echo "export PS1='\[\e[1;31m\]\u@\h:\w\\$\[\e[0m\] '" | tee -a /root/.bashrc /etc/skel/.bashrc && \
+    echo "alias tcurrent='tail /var/log/*/current -f'" | tee -a /root/.bashrc /etc/skel/.bashrc
 
 RUN apt-get update
-RUN apt-get install -y locales && locale-gen en_US en_US.UTF-8
+RUN apt-get install -y locales && locale-gen en_US.UTF-8 && dpkg-reconfigure locales
+ENV LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
 
 # Runit
 RUN apt-get install -y --no-install-recommends runit
@@ -18,23 +17,27 @@ CMD export > /etc/envvars && /usr/sbin/runsvdir-start
 RUN apt-get install -y --no-install-recommends vim less net-tools inetutils-ping wget curl git telnet nmap socat dnsutils netcat tree htop unzip sudo software-properties-common jq psmisc iproute python ssh rsync gettext-base
 
 #Etcd
-RUN wget -O - https://github.com/coreos/etcd/releases/download/v3.1.9/etcd-v3.1.9-linux-amd64.tar.gz | tar zx
+RUN wget -O - https://github.com/coreos/etcd/releases/download/v3.2.5/etcd-v3.2.5-linux-amd64.tar.gz | tar zx
 RUN mv /etcd* /etcd && \
     ln -s /etcd/etcd /usr/local/bin/etcd && \
     ln -s /etcd/etcdctl /usr/local/bin/etcdctl
 RUN mkdir -p /var/lib/etcd-data
 
-#Kubernetes
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.7.1/bin/linux/amd64/kube-apiserver
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.7.1/bin/linux/amd64/kube-controller-manager
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.7.1/bin/linux/amd64/kube-scheduler
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.7.1/bin/linux/amd64/kubectl
-RUN chmod +x /usr/local/bin/kube*
-
 #Influxdb
-RUN wget https://dl.influxdata.com/influxdb/releases/influxdb_1.2.4_amd64.deb && \
+RUN wget https://dl.influxdata.com/influxdb/releases/influxdb_1.3.2_amd64.deb && \
     dpkg -i influxdb*.deb && \
     rm influxdb*.deb
+
+#Heapster
+COPY heapster /heapster
+COPY --from=gcr.io/google_containers/heapster:v1.4.1 heapster /heapster/heapster
+
+#Kubernetes
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.7.4/bin/linux/amd64/kube-apiserver
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.7.4/bin/linux/amd64/kube-controller-manager
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.7.4/bin/linux/amd64/kube-scheduler
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.7.4/bin/linux/amd64/kubectl
+RUN chmod +x /usr/local/bin/kube*
 
 #Security
 RUN mkdir -p /srv/kubernetes
@@ -48,10 +51,6 @@ RUN openssl genrsa -out /srv/kubernetes/ca.key 2048 && \
 RUN TOKEN=$(dd if=/dev/urandom bs=128 count=1 2>/dev/null | base64 | tr -d "=+/" | dd bs=32 count=1 2>/dev/null) && \
     mkdir -p /srv/kube-apiserver && \
     echo "${TOKEN},kubelet,kubelet" > /srv/kube-apiserver/known_tokens.csv
-
-#Heapster
-COPY heapster /heapster
-COPY --from=gcr.io/google_containers/heapster:v1.3.0 heapster /heapster/heapster
 
 #Scheduler Policy
 COPY scheduler-policy.json /etc/
