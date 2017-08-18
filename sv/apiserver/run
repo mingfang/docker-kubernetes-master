@@ -22,7 +22,6 @@ KUBE_APISERVER_OPTS="\
 --token_auth_file=/srv/kube-apiserver/known_tokens.csv \
 --storage-backend=etcd2 \
 --storage-media-type=application/json \
---audit-log-path=/var/log/apiserver/audit.log \
 "
 
 exec 2>&1
