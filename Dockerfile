@@ -30,13 +30,13 @@ RUN wget https://dl.influxdata.com/influxdb/releases/influxdb_1.3.2_amd64.deb &&
 
 #Heapster
 COPY heapster /heapster
-COPY --from=gcr.io/google_containers/heapster:v1.4.1 heapster /heapster/heapster
+COPY --from=gcr.io/google_containers/heapster:v1.4.2 heapster /heapster/heapster
 
 #Kubernetes
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.7.4/bin/linux/amd64/kube-apiserver
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.7.4/bin/linux/amd64/kube-controller-manager
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.7.4/bin/linux/amd64/kube-scheduler
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.7.4/bin/linux/amd64/kubectl
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.7.5/bin/linux/amd64/kube-apiserver
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.7.5/bin/linux/amd64/kube-controller-manager
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.7.5/bin/linux/amd64/kube-scheduler
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.7.5/bin/linux/amd64/kubectl
 RUN chmod +x /usr/local/bin/kube*
 
 #Security
