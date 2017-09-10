@@ -32,6 +32,9 @@ RUN wget https://dl.influxdata.com/influxdb/releases/influxdb_1.3.2_amd64.deb &&
 COPY heapster /heapster
 COPY --from=gcr.io/google_containers/heapster:v1.4.2 heapster /heapster/heapster
 
+#Rescheduler
+COPY --from=gcr.io/google-containers/rescheduler:v0.3.1 rescheduler /usr/local/bin/rescheduler
+
 #Kubernetes
 RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.7.5/bin/linux/amd64/kube-apiserver
 RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.7.5/bin/linux/amd64/kube-controller-manager
