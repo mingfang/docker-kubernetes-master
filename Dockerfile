@@ -28,6 +28,12 @@ RUN wget https://dl.influxdata.com/influxdb/releases/influxdb_1.3.6_amd64.deb &&
     dpkg -i influxdb*.deb && \
     rm influxdb*.deb
 
+#Vault
+RUN wget https://releases.hashicorp.com/vault/0.8.3/vault_0.8.3_linux_amd64.zip && \
+    unzip vault*.zip && \
+    rm vault*.zip && \
+    mv vault /usr/local/bin/
+
 #Heapster
 COPY heapster /heapster
 COPY --from=gcr.io/google_containers/heapster:v1.4.2 heapster /heapster/heapster
@@ -44,19 +50,22 @@ RUN chmod +x /usr/local/bin/kube*
 
 #Security
 RUN mkdir -p /srv/kubernetes
-COPY openssl.cnf /srv/kubernetes/
-RUN openssl genrsa -out /srv/kubernetes/ca.key 2048 && \
-    openssl req -x509 -new -nodes -key /srv/kubernetes/ca.key -subj "/CN=kube-ca" -days 10000 -out /srv/kubernetes/ca.crt && \
-    openssl genrsa -out /srv/kubernetes/server.key 2048 && \
-    openssl req -new -key /srv/kubernetes/server.key -subj "/CN=kube-apiserver" -out /srv/kubernetes/server.csr -config /srv/kubernetes/openssl.cnf && \
-    openssl x509 -req -in /srv/kubernetes/server.csr -CA /srv/kubernetes/ca.crt -CAkey /srv/kubernetes/ca.key -CAcreateserial -out /srv/kubernetes/server.crt -days 10000 -extensions v3_req -extfile /srv/kubernetes/openssl.cnf && \
-    openssl genrsa -out /srv/kubernetes/service-account.key 2048
-RUN TOKEN=$(dd if=/dev/urandom bs=128 count=1 2>/dev/null | base64 | tr -d "=+/" | dd bs=32 count=1 2>/dev/null) && \
-    mkdir -p /srv/kube-apiserver && \
-    echo "${TOKEN},kubelet,kubelet" > /srv/kube-apiserver/known_tokens.csv
+#COPY openssl.cnf /srv/kubernetes/
+#RUN openssl genrsa -out /srv/kubernetes/ca.key 2048 && \
+#    openssl req -x509 -new -nodes -key /srv/kubernetes/ca.key -subj "/CN=kube-ca" -days 10000 -out /srv/kubernetes/ca.crt && \
+#    openssl genrsa -out /srv/kubernetes/server.key 2048 && \
+#    openssl req -new -key /srv/kubernetes/server.key -subj "/CN=kube-apiserver" -out /srv/kubernetes/server.csr -config /srv/kubernetes/openssl.cnf && \
+#    openssl x509 -req -in /srv/kubernetes/server.csr -CA /srv/kubernetes/ca.crt -CAkey /srv/kubernetes/ca.key -CAcreateserial -out /srv/kubernetes/server.crt -days 10000 -extensions v3_req -extfile /srv/kubernetes/openssl.cnf && \
+#    openssl genrsa -out /srv/kubernetes/service-account.key 2048
+#RUN TOKEN=$(dd if=/dev/urandom bs=128 count=1 2>/dev/null | base64 | tr -d "=+/" | dd bs=32 count=1 2>/dev/null) && \
+#    mkdir -p /srv/kube-apiserver && \
+#    echo "${TOKEN},kubelet,kubelet" > /srv/kube-apiserver/known_tokens.csv
 
 #Scheduler Policy
 COPY scheduler-policy.json /etc/
+COPY vault-init.sh /
+COPY vault.hcl /
+ENV VAULT_ADDR=http://0.0.0.0:8200
 
 # Add runit services
 COPY sv /etc/service 

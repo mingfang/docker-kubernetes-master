@@ -1,1 +1,11 @@
-docker run -v `pwd`/etcd-data:/var/lib/etcd-data --net=host -p 3000:3000 -p 4001:4001 -p 8080:8080 -v `pwd`:/docker -w /docker --rm -i -t kubernetes-master /bin/bash
+docker rm -f kmaster
+docker run \
+       --name kmaster \
+       --net=host \
+       -p 4001:4001 \
+       -p 8080:8080 \
+       -p 8200:8200 \
+       -v `pwd`/etcd-data:/var/lib/etcd-data \
+       -v `pwd`/vault-data:/var/lib/vault-data \
+       -v /var/log:/var/log \
+       -it kubernetes-master bash

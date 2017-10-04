@@ -9,8 +9,6 @@ KUBE_CONTROLLER_MANAGER_OPTS="\
 --node-monitor-grace-period=20s \
 --pod-eviction-timeout=300s \
 --logtostderr=true \
---root-ca-file=/srv/kubernetes/ca.crt \
---service-account-private-key-file=/srv/kubernetes/service-account.key \
 "
 
 exec 2>&1

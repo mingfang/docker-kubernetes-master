@@ -1,3 +1,5 @@
+.idea
 etcd-data/
+vault-data/
 .git
 **/node_modules
