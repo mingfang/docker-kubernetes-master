@@ -24,7 +24,7 @@ KUBE_APISERVER_OPTS="\
 --event-ttl=1h \
 --enable-swagger-ui=true \
 --logtostderr=true \
---v=2 \
+--v=1 \
 "
 
 /vault-init.sh
