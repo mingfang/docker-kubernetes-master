@@ -36,7 +36,7 @@ RUN wget https://releases.hashicorp.com/vault/0.8.3/vault_0.8.3_linux_amd64.zip 
 
 #Heapster
 COPY heapster /heapster
-COPY --from=gcr.io/google_containers/heapster:v1.4.2 heapster /heapster/heapster
+COPY --from=gcr.io/google_containers/heapster:v1.4.3 heapster /heapster/heapster
 
 #Rescheduler
 COPY --from=gcr.io/google-containers/rescheduler:v0.3.1 rescheduler /usr/local/bin/rescheduler
