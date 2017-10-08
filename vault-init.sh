@@ -31,6 +31,35 @@ vault write kubernetes/roles/kubelet allow_any_name=true enforce_hostnames=false
 #kube-proxy pki role
 vault write kubernetes/roles/kube-proxy allow_any_name=true enforce_hostnames=false max_ttl="720h"
 
+#enable AWS integration
+vault auth-enable aws
+
+#vault aws policy
+cat <<EOT | vault policy-write aws/policy/vault -
+path "secret/aws/*" {
+  policy = "write"
+}
+path "auth/aws/login" {
+  policy = "write"
+}
+EOT
+
+#vault aws role
+vault write auth/aws/role/vault auth_type=ec2 policies="aws/policy/vault"
+
+#ec2 instance aws policy
+cat <<EOT | vault policy-write aws/policy/ec2 -
+path "secret/aws/*" {
+  policy = "write"
+}
+path "auth/aws/login" {
+  policy = "write"
+}
+EOT
+
+#ec2 aws role
+vault write auth/aws/role/ec2 auth_type=ec2 policies="aws/policy/ec2"
+
 #kube-apiserver vault policy
 cat <<EOT | vault policy-write kubernetes/policy/kube-apiserver -
 path "kubernetes/issue/kube-apiserver" {
@@ -46,6 +75,7 @@ cat <<EOT | vault policy-write kubernetes/policy/kubelet -
 path "kubernetes/issue/kubelet" {
   policy = "write"
 }
+
 path "secret/kubernetes/service-account-key" {
   policy = "read"
 }
