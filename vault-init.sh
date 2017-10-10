@@ -89,6 +89,9 @@ path "secret/aws/*" {
 path "auth/aws/login" {
   policy = "write"
 }
+path "auth/token/lookup-self" {
+  policy = "read"
+}
 EOT
 #knode aws role
 vault write auth/aws/role/knode auth_type=ec2 bound_vpc_id="$VPC_ID" policies="aws/policy/knode,kubernetes/policy/kubelet,kubernetes/policy/kube-proxy"
