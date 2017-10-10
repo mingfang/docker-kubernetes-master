@@ -1,6 +1,7 @@
 docker rm -f kmaster
 docker run \
        -e VPC_ID=$VPC_ID \
+       -e ALT_NAMES=$ALT_NAMES \
        --name kmaster \
        --net=host \
        -p 4001:4001 \
