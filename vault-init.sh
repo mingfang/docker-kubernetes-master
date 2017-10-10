@@ -77,7 +77,7 @@ vault write auth/token/roles/kube-proxy period="720h" orphan=true allowed_polici
 #vault write secret/kubernetes/service-account-key key=@$VAULT_DATA/service-account-key
 #rm $VAULT_DATA/service-account-key
 
-if $VPC_ID; then
+if [ "$VPC_ID" ]; then
 #enable AWS integration
 vault auth-enable aws
 
