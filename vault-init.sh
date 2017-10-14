@@ -1,10 +1,12 @@
 #!/bin/bash
 
 vault server -config=/vault.hcl&
-sleep 3
-VAULT_DATA=/var/lib/vault-data
+sleep 10
 
-if ! vault init -check; then
+VAULT_DATA=/var/lib/vault-data
+mkdir -p $VAULT_DATA
+
+if [ ! "$(ls -A $VAULT_DATA)" ]; then
     echo "Initializing Vault..."
     vault init > $VAULT_DATA/VAULT_INIT
 fi
