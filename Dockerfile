@@ -42,24 +42,14 @@ COPY --from=gcr.io/google_containers/heapster:v1.4.3 heapster /heapster/heapster
 COPY --from=gcr.io/google-containers/rescheduler:v0.3.1 rescheduler /usr/local/bin/rescheduler
 
 #Kubernetes
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.8.0/bin/linux/amd64/kube-apiserver
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.8.0/bin/linux/amd64/kube-controller-manager
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.8.0/bin/linux/amd64/kube-scheduler
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.8.0/bin/linux/amd64/kubectl
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.8.1/bin/linux/amd64/kube-apiserver
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.8.1/bin/linux/amd64/kube-controller-manager
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.8.1/bin/linux/amd64/kube-scheduler
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.8.1/bin/linux/amd64/kubectl
 RUN chmod +x /usr/local/bin/kube*
 
 #Security
 RUN mkdir -p /srv/kubernetes
-#COPY openssl.cnf /srv/kubernetes/
-#RUN openssl genrsa -out /srv/kubernetes/ca.key 2048 && \
-#    openssl req -x509 -new -nodes -key /srv/kubernetes/ca.key -subj "/CN=kube-ca" -days 10000 -out /srv/kubernetes/ca.crt && \
-#    openssl genrsa -out /srv/kubernetes/server.key 2048 && \
-#    openssl req -new -key /srv/kubernetes/server.key -subj "/CN=kube-apiserver" -out /srv/kubernetes/server.csr -config /srv/kubernetes/openssl.cnf && \
-#    openssl x509 -req -in /srv/kubernetes/server.csr -CA /srv/kubernetes/ca.crt -CAkey /srv/kubernetes/ca.key -CAcreateserial -out /srv/kubernetes/server.crt -days 10000 -extensions v3_req -extfile /srv/kubernetes/openssl.cnf && \
-#    openssl genrsa -out /srv/kubernetes/service-account.key 2048
-#RUN TOKEN=$(dd if=/dev/urandom bs=128 count=1 2>/dev/null | base64 | tr -d "=+/" | dd bs=32 count=1 2>/dev/null) && \
-#    mkdir -p /srv/kube-apiserver && \
-#    echo "${TOKEN},kubelet,kubelet" > /srv/kube-apiserver/known_tokens.csv
 
 #Scheduler Policy
 COPY scheduler-policy.json /etc/

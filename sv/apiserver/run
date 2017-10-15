@@ -33,6 +33,7 @@ grep "token " /dev/shm/KMASTER_TOKEN | awk '{print $2}' | xargs vault auth
 rm /dev/shm/KMASTER_TOKEN
 
 #API-Server cert and key
+mkdir -p /srv/kubernetes
 DATA=$(vault write --format=json kubernetes/issue/kube-apiserver common_name=$HOSTNAME alt_names="$ALT_NAMES")
 echo $DATA|jq -r .data.issuing_ca > /srv/kubernetes/api-server-ca.pem
 echo $DATA|jq -r .data.certificate > /srv/kubernetes/api-server-cert.pem
