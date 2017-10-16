@@ -9,5 +9,6 @@ docker run \
        -p 8200:8200 \
        -v `pwd`/etcd-data:/var/lib/etcd-data \
        -v `pwd`/vault-data:/var/lib/vault-data \
+       -v `pwd`/pki:/srv/kubernetes \
        -v /var/log:/var/log \
        -d kubernetes-master
