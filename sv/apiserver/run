@@ -5,10 +5,11 @@ sv start etcd || exit 1
 source /etc/envvars
 
 export PKI_DIR=/srv/kubernetes
+export SECURE_PORT=6443
 
 KUBE_APISERVER_OPTS="\
 --insecure-port=8080 \
---secure-port=443 \
+--secure-port=$SECURE_PORT \
 --etcd_servers=http://127.0.0.1:4001 \
 --service-cluster-ip-range=172.27.0.0/16 \
 --admission-control=NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota,DefaultTolerationSeconds,PodPreset \
@@ -57,7 +58,7 @@ fi
 
 export ROLE=cluster-admin
 export USER=cluster-admin
-export KUBERNETES_MASTER=https://z1:443
+export KUBERNETES_MASTER=${KUBERNETES_MASTER="https://$HOSTNAME:$SECURE_PORT"}
 
 mkdir -p $PKI_DIR
 kubectl config set-cluster kubernetes \
