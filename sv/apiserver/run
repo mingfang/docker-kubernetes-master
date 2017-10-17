@@ -4,6 +4,8 @@ sv start etcd || exit 1
 
 source /etc/envvars
 
+export PKI_DIR=/srv/kubernetes
+
 KUBE_APISERVER_OPTS="\
 --insecure-port=8080 \
 --secure-port=443 \
@@ -14,9 +16,9 @@ KUBE_APISERVER_OPTS="\
 --allow-privileged=true \
 --anonymous-auth=false \
 --runtime-config="api/all,settings.k8s.io/v1alpha1" \
---client-ca-file=/srv/kubernetes/api-server-ca.pem \
---tls-cert-file=/srv/kubernetes/api-server-cert.pem \
---tls-private-key-file=/srv/kubernetes/api-server-key.pem \
+--client-ca-file=$PKI_DIR/api-server-ca.pem \
+--tls-cert-file=$PKI_DIR/api-server-cert.pem \
+--tls-private-key-file=$PKI_DIR/api-server-key.pem \
 --storage-backend=etcd2 \
 --storage-media-type=application/json \
 --cloud-config="" \
@@ -33,13 +35,47 @@ grep "token " /dev/shm/KMASTER_TOKEN | awk '{print $2}' | xargs vault auth
 rm /dev/shm/KMASTER_TOKEN
 
 #API-Server cert and key
-mkdir -p /srv/kubernetes
-if [ ! -f /srv/kubernetes/api-server-ca.pem ]; then
+mkdir -p $PKI_DIR
+if [ ! -f $PKI_DIR/api-server-ca.pem ]; then
   DATA=$(vault write --format=json kubernetes/issue/kube-apiserver common_name=kubernetes alt_names="${HOSTNAME},${ALT_NAMES}" ip_sans="172.27.0.1")
-  echo $DATA|jq -r .data.issuing_ca > /srv/kubernetes/api-server-ca.pem
-  echo $DATA|jq -r .data.certificate > /srv/kubernetes/api-server-cert.pem
-  echo $DATA|jq -r .data.private_key > /srv/kubernetes/api-server-key.pem
+  echo $DATA|jq -r .data.issuing_ca > $PKI_DIR/api-server-ca.pem
+  echo $DATA|jq -r .data.certificate > $PKI_DIR/api-server-cert.pem
+  echo $DATA|jq -r .data.private_key > $PKI_DIR/api-server-key.pem
 fi
+
+grep "token " /dev/shm/CLUSTER_ADMIN_TOKEN | awk '{print $2}' | xargs vault auth
+rm /dev/shm/CLUSTER_ADMIN_TOKEN
+
+#cluster-admin cert and key
+mkdir -p $PKI_DIR
+if [ ! -f $PKI_DIR/cluster-admin-ca.pem ]; then
+  DATA=$(vault write --format=json kubernetes/issue/cluster-admin common_name=cluster-admin)
+  echo $DATA|jq -r .data.issuing_ca > $PKI_DIR/cluster-admin-ca.pem
+  echo $DATA|jq -r .data.certificate > $PKI_DIR/cluster-admin-cert.pem
+  echo $DATA|jq -r .data.private_key > $PKI_DIR/cluster-admin-key.pem
+fi
+
+export ROLE=cluster-admin
+export USER=cluster-admin
+export KUBERNETES_MASTER=https://z1:443
+
+mkdir -p $PKI_DIR
+kubectl config set-cluster kubernetes \
+    --certificate-authority=$PKI_DIR/$ROLE-ca.pem \
+    --embed-certs=true \
+    --server=$KUBERNETES_MASTER \
+    --kubeconfig=$PKI_DIR/$ROLE-kubeconfig.yml
+kubectl config set-credentials $USER \
+    --client-certificate=$PKI_DIR/$ROLE-cert.pem \
+    --embed-certs=true \
+    --client-key=$PKI_DIR/$ROLE-key.pem \
+    --kubeconfig=$PKI_DIR/$ROLE-kubeconfig.yml
+kubectl config set-context default \
+    --cluster=kubernetes \
+    --user=$USER \
+    --kubeconfig=$PKI_DIR/$ROLE-kubeconfig.yml
+kubectl config use-context default --kubeconfig=$PKI_DIR/$ROLE-kubeconfig.yml
+rm $PKI_DIR/$ROLE*.pem
 
 exec 2>&1
 exec kube-apiserver ${KUBE_APISERVER_OPTS}

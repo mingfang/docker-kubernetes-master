@@ -29,7 +29,7 @@ vault write kubernetes/root/generate/internal common_name=kubernetes ttl=87600h
 vault write kubernetes/roles/kube-apiserver allow_any_name=true enforce_hostnames=false max_ttl="720h"
 
 #kubelet pki role
-vault write kubernetes/roles/kubelet allow_any_name=true enforce_hostnames=false organization="system:nodes" max_ttl="720h"
+vault write kubernetes/roles/kubelet organization="system:nodes" allow_any_name=true enforce_hostnames=false max_ttl="720h"
 
 #kube-proxy pki role
 vault write kubernetes/roles/kube-proxy allow_any_name=true enforce_hostnames=false max_ttl="720h"
@@ -101,4 +101,24 @@ fi
 
 #setup token for kmaster
 vault token-create -role="kube-apiserver" > /dev/shm/KMASTER_TOKEN
+
+#cluster-admin pki role
+vault write kubernetes/roles/cluster-admin organization="system:masters" allow_any_name=true enforce_hostnames=false max_ttl="720h"
+
+#cluster-admin vault policy
+cat <<EOT | vault policy-write kubernetes/policy/cluster-admin -
+path "kubernetes/issue/cluster-admin" {
+  policy = "write"
+}
+path "secret/kubernetes/service-account-key" {
+  policy = "read"
+}
+EOT
+
+#cluster-admin auth role
+vault write auth/token/roles/cluster-admin period="720h" orphan=true allowed_policies="kubernetes/policy/cluster-admin"
+
+#setup token for cluster-admin
+vault token-create -role="cluster-admin" > /dev/shm/CLUSTER_ADMIN_TOKEN
+
 
