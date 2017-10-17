@@ -6,7 +6,7 @@ sleep 10
 VAULT_DATA=/var/lib/vault-data
 mkdir -p $VAULT_DATA
 
-if [ ! "$(ls -A $VAULT_DATA)" ]; then
+if [ ! "$(ls $VAULT_DATA)" ]; then
     echo "Initializing Vault..."
     vault init > $VAULT_DATA/VAULT_INIT
 fi
