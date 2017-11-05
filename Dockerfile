@@ -48,11 +48,8 @@ RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/rel
 RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.8.1/bin/linux/amd64/kubectl
 RUN chmod +x /usr/local/bin/kube*
 
-#Security
+#Vault
 RUN mkdir -p /srv/kubernetes
-
-#Scheduler Policy
-COPY scheduler-policy.json /etc/
 COPY vault-init.sh /
 COPY vault.hcl /
 ENV VAULT_ADDR=http://0.0.0.0:8200

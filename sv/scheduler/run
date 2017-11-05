@@ -4,8 +4,6 @@ sv apiserver etcd || exit 1
 
 source /etc/envvars
 
-:${SCHEDULER_POLICY_FILE="/etc/scheduler-policy.json"}
-
 KUBE_SCHEDULER_OPTS="\
   --logtostderr=true \
   --master=127.0.0.1:8080 \
