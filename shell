@@ -1,8 +1,12 @@
+#!/bin/bash
+
 docker rm -f kmaster
 docker run \
-       -e KUBERNETES_MASTER=$KUBERNETES_MASTER \
-       -e VPC_ID=$VPC_ID \
-       -e ALT_NAMES=$ALT_NAMES \
+       -e KUBERNETES_MASTER="$KUBERNETES_MASTER" \
+       -e CLOUD_PROVIDER="$CLOUD_PROVIDER" \
+       -e AWS_PROFILE="$AWS_PROFILE" \
+       -e VPC_ID="$VPC_ID" \
+       -e ALT_NAMES="$ALT_NAMES" \
        --name kmaster \
        --net=host \
        -p 4001:4001 \
