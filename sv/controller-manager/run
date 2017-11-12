@@ -7,7 +7,6 @@ source /etc/envvars
 until curl 127.0.0.1:8080; do echo "Waiting for API Server..."; sleep 3; done;
 
 KUBE_CONTROLLER_MANAGER_OPTS="\
---cloud-provider="$CLOUD_PROVIDER" \
 --master=127.0.0.1:8080 \
 --root-ca-file=/srv/kubernetes/api-server-ca.pem \
 --service-account-private-key-file=/srv/kubernetes/api-server-key.pem \

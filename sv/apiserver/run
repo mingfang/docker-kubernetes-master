@@ -8,7 +8,6 @@ export PKI_DIR=/srv/kubernetes
 export SECURE_PORT=6443
 
 KUBE_APISERVER_OPTS="\
---cloud-provider="$CLOUD_PROVIDER" \
 --insecure-port=8080 \
 --secure-port=$SECURE_PORT \
 --etcd_servers=http://127.0.0.1:4001 \
