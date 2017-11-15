@@ -54,6 +54,12 @@ COPY vault-init.sh /
 COPY vault.hcl /
 ENV VAULT_ADDR=http://0.0.0.0:8200
 
+#FlexVolume
+RUN mkdir -p /usr/libexec/kubernetes/kubelet-plugins/volume/exec
+RUN git clone --depth=1 https://github.com/mingfang/flexvolume-ebs.git /usr/libexec/kubernetes/kubelet-plugins/volume/exec/flexvolume~ebs
+RUN /usr/libexec/kubernetes/kubelet-plugins/volume/exec/flexvolume~ebs/install
+RUN chmod +x /usr/libexec/kubernetes/kubelet-plugins/volume/exec/*/*
+
 # Add runit services
 COPY sv /etc/service 
 ARG BUILD_INFO
