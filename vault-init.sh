@@ -26,13 +26,13 @@ vault mount-tune -max-lease-ttl=87600h kubernetes
 vault write kubernetes/root/generate/internal common_name=kubernetes ttl=87600h
 
 #api-server pki role
-vault write kubernetes/roles/kube-apiserver allow_any_name=true enforce_hostnames=false max_ttl="720h"
+vault write kubernetes/roles/kube-apiserver allow_any_name=true enforce_hostnames=false max_ttl="87600h"
 
 #kubelet pki role
-vault write kubernetes/roles/kubelet organization="system:nodes" allow_any_name=true enforce_hostnames=false max_ttl="720h"
+vault write kubernetes/roles/kubelet organization="system:nodes" allow_any_name=true enforce_hostnames=false max_ttl="87600h"
 
 #kube-proxy pki role
-vault write kubernetes/roles/kube-proxy allow_any_name=true enforce_hostnames=false max_ttl="720h"
+vault write kubernetes/roles/kube-proxy allow_any_name=true enforce_hostnames=false max_ttl="87600h"
 
 #kube-apiserver vault policy
 cat <<EOT | vault policy-write kubernetes/policy/kube-apiserver -
@@ -66,13 +66,13 @@ path "secret/kubernetes/service-account-key" {
 EOT
 
 #kube-apiserver auth role
-vault write auth/token/roles/kube-apiserver period="720h" orphan=true allowed_policies="kubernetes/policy/kube-apiserver"
+vault write auth/token/roles/kube-apiserver period="87600h" orphan=true allowed_policies="kubernetes/policy/kube-apiserver"
 
 #kubelet auth role
-vault write auth/token/roles/kubelet period="720h" orphan=true allowed_policies="kubernetes/policy/kubelet"
+vault write auth/token/roles/kubelet period="87600h" orphan=true allowed_policies="kubernetes/policy/kubelet"
 
 #kube-proxy auth role
-vault write auth/token/roles/kube-proxy period="720h" orphan=true allowed_policies="kubernetes/policy/kube-proxy"
+vault write auth/token/roles/kube-proxy period="87600h" orphan=true allowed_policies="kubernetes/policy/kube-proxy"
 
 #service account secret key
 #openssl genrsa 4096 > $VAULT_DATA/service-account-key
@@ -103,7 +103,7 @@ fi
 vault token-create -role="kube-apiserver" > /dev/shm/KMASTER_TOKEN
 
 #cluster-admin pki role
-vault write kubernetes/roles/cluster-admin organization="system:masters" allow_any_name=true enforce_hostnames=false max_ttl="720h"
+vault write kubernetes/roles/cluster-admin organization="system:masters" allow_any_name=true enforce_hostnames=false max_ttl="87600h"
 
 #cluster-admin vault policy
 cat <<EOT | vault policy-write kubernetes/policy/cluster-admin -
@@ -116,7 +116,7 @@ path "secret/kubernetes/service-account-key" {
 EOT
 
 #cluster-admin auth role
-vault write auth/token/roles/cluster-admin period="720h" orphan=true allowed_policies="kubernetes/policy/cluster-admin"
+vault write auth/token/roles/cluster-admin period="87600h" orphan=true allowed_policies="kubernetes/policy/cluster-admin"
 
 #setup token for cluster-admin
 vault token-create -role="cluster-admin" > /dev/shm/CLUSTER_ADMIN_TOKEN
