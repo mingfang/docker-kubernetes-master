@@ -120,5 +120,3 @@ vault write auth/token/roles/cluster-admin period="87600h" orphan=true allowed_p
 
 #setup token for cluster-admin
 vault token-create -role="cluster-admin" > /dev/shm/CLUSTER_ADMIN_TOKEN
-
-
