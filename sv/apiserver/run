@@ -36,7 +36,7 @@ rm /dev/shm/KMASTER_TOKEN
 #API-Server cert and key
 mkdir -p $PKI_DIR
 if [ ! -f $PKI_DIR/api-server-ca.pem ]; then
-  DATA=$(vault write --format=json kubernetes/issue/kube-apiserver common_name=kubernetes alt_names="${HOSTNAME},${ALT_NAMES}" ip_sans="172.27.0.1")
+  DATA=$(vault write --format=json kubernetes/issue/kube-apiserver common_name=kubernetes alt_names="${HOSTNAME},${ALT_NAMES}" ip_sans="172.27.0.1" ttl=8760h)
   echo $DATA|jq -r .data.issuing_ca > $PKI_DIR/api-server-ca.pem
   echo $DATA|jq -r .data.certificate > $PKI_DIR/api-server-cert.pem
   echo $DATA|jq -r .data.private_key > $PKI_DIR/api-server-key.pem
@@ -48,7 +48,7 @@ rm /dev/shm/CLUSTER_ADMIN_TOKEN
 #cluster-admin cert and key
 mkdir -p $PKI_DIR
 if [ ! -f $PKI_DIR/cluster-admin-ca.pem ]; then
-  DATA=$(vault write --format=json kubernetes/issue/cluster-admin common_name=cluster-admin)
+  DATA=$(vault write --format=json kubernetes/issue/cluster-admin common_name=cluster-admin ttl=8760h)
   echo $DATA|jq -r .data.issuing_ca > $PKI_DIR/cluster-admin-ca.pem
   echo $DATA|jq -r .data.certificate > $PKI_DIR/cluster-admin-cert.pem
   echo $DATA|jq -r .data.private_key > $PKI_DIR/cluster-admin-key.pem
