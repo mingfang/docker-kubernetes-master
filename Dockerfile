@@ -17,14 +17,14 @@ CMD export > /etc/envvars && /usr/sbin/runsvdir-start
 RUN apt-get install -y --no-install-recommends vim less net-tools inetutils-ping wget curl git telnet nmap socat dnsutils netcat tree htop unzip sudo software-properties-common jq psmisc iproute python ssh rsync gettext-base
 
 #Etcd
-RUN wget -O - https://github.com/coreos/etcd/releases/download/v3.2.9/etcd-v3.2.9-linux-amd64.tar.gz | tar zx
+RUN wget -O - https://github.com/coreos/etcd/releases/download/v3.2.11/etcd-v3.2.11-linux-amd64.tar.gz | tar zx
 RUN mv /etcd* /etcd && \
     ln -s /etcd/etcd /usr/local/bin/etcd && \
     ln -s /etcd/etcdctl /usr/local/bin/etcdctl
 RUN mkdir -p /var/lib/etcd-data
 
 #Influxdb
-RUN wget https://dl.influxdata.com/influxdb/releases/influxdb_1.3.7_amd64.deb && \
+RUN wget https://dl.influxdata.com/influxdb/releases/influxdb_1.4.2_amd64.deb && \
     dpkg -i influxdb*.deb && \
     rm influxdb*.deb
 
@@ -36,16 +36,16 @@ RUN wget https://releases.hashicorp.com/vault/0.8.3/vault_0.8.3_linux_amd64.zip 
 
 #Heapster
 COPY heapster /heapster
-COPY --from=gcr.io/google_containers/heapster:v1.4.3 heapster /heapster/heapster
+COPY --from=gcr.io/google_containers/heapster:v1.5.0 heapster /heapster/heapster
 
 #Rescheduler
 COPY --from=gcr.io/google-containers/rescheduler:v0.3.1 rescheduler /usr/local/bin/rescheduler
 
 #Kubernetes
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.8.5/bin/linux/amd64/kube-apiserver
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.8.5/bin/linux/amd64/kube-controller-manager
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.8.5/bin/linux/amd64/kube-scheduler
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.8.5/bin/linux/amd64/kubectl
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-apiserver
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-controller-manager
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-scheduler
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl
 RUN chmod +x /usr/local/bin/kube*
 
 #Vault
