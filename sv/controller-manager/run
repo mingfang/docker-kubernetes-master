@@ -12,6 +12,7 @@ KUBE_CONTROLLER_MANAGER_OPTS="\
 --service-account-private-key-file=/srv/kubernetes/api-server-key.pem \
 --node-monitor-grace-period=20s \
 --pod-eviction-timeout=300s \
+--terminated-pod-gc-threshold 100 \
 --logtostderr=true \
 "
 
