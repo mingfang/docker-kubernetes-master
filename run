@@ -1,11 +1,14 @@
 #!/bin/bash
 
+FEATURE_GATES="SupportIPVSProxyMode=true,PodPriority=true"
+
 docker rm -f kmaster
 docker run \
        -e KUBERNETES_MASTER="$KUBERNETES_MASTER" \
        -e REGION="$REGION" \
        -e VPC_ID="$VPC_ID" \
        -e ALT_NAMES="$ALT_NAMES" \
+       -e FEATURE_GATES="$FEATURE_GATES" \
        --name kmaster \
        --net=host \
        -p 4001:4001 \

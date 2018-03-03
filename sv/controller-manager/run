@@ -10,6 +10,7 @@ KUBE_CONTROLLER_MANAGER_OPTS="\
 --master=127.0.0.1:8080 \
 --root-ca-file=/srv/kubernetes/api-server-ca.pem \
 --service-account-private-key-file=/srv/kubernetes/api-server-key.pem \
+--feature-gates=$FEATURE_GATES \
 --node-monitor-grace-period=20s \
 --pod-eviction-timeout=300s \
 --terminated-pod-gc-threshold 100 \
