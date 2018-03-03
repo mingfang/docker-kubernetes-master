@@ -38,9 +38,6 @@ RUN wget https://releases.hashicorp.com/vault/0.8.3/vault_0.8.3_linux_amd64.zip 
 COPY heapster /heapster
 COPY --from=gcr.io/google_containers/heapster:v1.5.1 heapster /heapster/heapster
 
-#Rescheduler
-COPY --from=gcr.io/google-containers/rescheduler:v0.3.1 rescheduler /usr/local/bin/rescheduler
-
 #Kubernetes
 RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.9.3/bin/linux/amd64/kube-apiserver
 RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.9.3/bin/linux/amd64/kube-controller-manager

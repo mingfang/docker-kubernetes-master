@@ -1,6 +1,0 @@
-#!/bin/bash
-
-source /etc/envvars
-
-exec 2>&1
-exec rescheduler --running-in-cluster=false
