@@ -1,6 +1,6 @@
 #!/bin/bash
 
-FEATURE_GATES="SupportIPVSProxyMode=true,PodPriority=true"
+FEATURE_GATES="ReadOnlyAPIDataVolumes=false,SupportIPVSProxyMode=true,PodPriority=true"
 
 docker rm -f kmaster
 docker run \
