@@ -14,6 +14,7 @@ KUBE_CONTROLLER_MANAGER_OPTS="\
 --node-monitor-grace-period=20s \
 --pod-eviction-timeout=300s \
 --terminated-pod-gc-threshold 100 \
+--horizontal-pod-autoscaler-use-rest-clients=false \
 --logtostderr=true \
 "
 
