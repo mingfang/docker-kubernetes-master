@@ -37,7 +37,7 @@ rm /dev/shm/KMASTER_TOKEN
 #API-Server cert and key
 mkdir -p $PKI_DIR
 if [ ! -f $PKI_DIR/api-server-ca.pem ]; then
-  DATA=$(vault write --format=json kubernetes/issue/kube-apiserver common_name=kubernetes alt_names="${HOSTNAME},${ALT_NAMES}" ip_sans="172.27.0.1" ttl=8760h)
+  DATA=$(vault write --format=json kubernetes/issue/kube-apiserver common_name=kubernetes alt_names="kubernetes.default,kubernetes.default.svc,kubernetes.default.svc.cluster,kubernetes.default.svc.cluster.local,${HOSTNAME},${ALT_NAMES}" ip_sans="172.27.0.1" ttl=8760h)
   echo $DATA|jq -r .data.issuing_ca > $PKI_DIR/api-server-ca.pem
   echo $DATA|jq -r .data.certificate > $PKI_DIR/api-server-cert.pem
   echo $DATA|jq -r .data.private_key > $PKI_DIR/api-server-key.pem
