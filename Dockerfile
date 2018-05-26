@@ -16,6 +16,38 @@ CMD export > /etc/envvars && /usr/sbin/runsvdir-start
 # Utilities
 RUN apt-get install -y --no-install-recommends vim less net-tools inetutils-ping wget curl git telnet nmap socat dnsutils netcat tree htop unzip sudo software-properties-common jq psmisc iproute python ssh rsync gettext-base
 
+#Proxy needs iptables
+RUN apt-get install -y --no-install-recommends iptables conntrack
+
+#Dnsmasq and Confd used for DNS
+RUN apt-get install -y --no-install-recommends dnsmasq
+RUN wget -O /usr/local/bin/confd  https://github.com/kelseyhightower/confd/releases/download/v0.15.0/confd-0.15.0-linux-amd64 && \
+    chmod +x /usr/local/bin/confd
+
+#ZFS
+RUN apt-get install -y --no-install-recommends zfsutils-linux
+
+#NFS client
+RUN apt-get install -y nfs-common
+
+#XFS
+RUN apt-get install -y libguestfs-xfs
+
+#Ceph client
+RUN apt-get install -y ceph-common
+
+#For Hairpin-veth mode
+RUN apt-get install -y ethtool
+
+#IPVS
+RUN apt-get install -y ipvsadm ipset
+
+#Vault
+RUN wget https://releases.hashicorp.com/vault/0.9.5/vault_0.9.5_linux_amd64.zip && \
+    unzip vault*.zip && \
+    rm vault*.zip && \
+    mv vault /usr/local/bin/
+
 #Etcd
 RUN wget -O - https://github.com/coreos/etcd/releases/download/v3.3.3/etcd-v3.3.3-linux-amd64.tar.gz | tar zx
 RUN mv /etcd* /etcd && \
@@ -28,12 +60,6 @@ RUN wget https://dl.influxdata.com/influxdb/releases/influxdb_1.5.1_amd64.deb &&
     dpkg -i influxdb*.deb && \
     rm influxdb*.deb
 
-#Vault
-RUN wget https://releases.hashicorp.com/vault/0.9.5/vault_0.9.5_linux_amd64.zip && \
-    unzip vault*.zip && \
-    rm vault*.zip && \
-    mv vault /usr/local/bin/
-
 #Heapster
 COPY heapster /heapster
 COPY --from=gcr.io/google_containers/heapster:v1.5.2 heapster /heapster/heapster
@@ -42,8 +68,14 @@ COPY --from=gcr.io/google_containers/heapster:v1.5.2 heapster /heapster/heapster
 RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.10.3/bin/linux/amd64/kube-apiserver
 RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.10.3/bin/linux/amd64/kube-controller-manager
 RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.10.3/bin/linux/amd64/kube-scheduler
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.10.3/bin/linux/amd64/kubelet
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.10.3/bin/linux/amd64/kube-proxy
 RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.10.3/bin/linux/amd64/kubectl
 RUN chmod +x /usr/local/bin/kube*
+
+#Addon Manager
+COPY --from=gcr.io/google-containers/kube-addon-manager:v8.6 /opt/kube-addons.sh /opt/kube-addons.sh
+COPY --from=gcr.io/google-containers/kube-addon-manager:v8.6 /opt/namespace.yaml /opt/namespace.yaml 
 
 #Vault
 RUN mkdir -p /srv/kubernetes
@@ -56,6 +88,8 @@ RUN mkdir -p /usr/libexec/kubernetes/kubelet-plugins/volume/exec
 RUN git clone --depth=1 https://github.com/mingfang/flexvolume-ebs.git /usr/libexec/kubernetes/kubelet-plugins/volume/exec/flexvolume~ebs
 RUN /usr/libexec/kubernetes/kubelet-plugins/volume/exec/flexvolume~ebs/install
 RUN chmod +x /usr/libexec/kubernetes/kubelet-plugins/volume/exec/*/*
+
+COPY etc/kubernetes/addons /etc/kubernetes/addons
 
 # Add runit services
 COPY sv /etc/service 

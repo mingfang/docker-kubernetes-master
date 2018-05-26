@@ -1,0 +1,66 @@
+#!/bin/bash
+
+source /etc/envvars
+
+export IP=`ip route get 1 | awk '{print $7;exit}'`
+export ROLE=kubelet
+export USER="system:node:$NODE_NAME"
+
+HOST=`hostname -s`
+KUBELET_OPTS="\
+--hostname_override=$NODE_NAME \
+--address=0.0.0.0 \
+--cluster_dns=172.27.0.2 \
+--cluster-domain=cluster.local \
+--port=10250 \
+--containerized=false \
+--image-gc-high-threshold=50 \
+--image-gc-low-threshold=30 \
+--registry-qps=0 \
+--hairpin-mode=hairpin-veth \
+--serialize-image-pulls=false \
+--node-labels=host=${HOST},${LABELS} \
+--allow-privileged=true \
+--pod-manifest-path=/etc/kubernetes/manifests \
+--kube-reserved=cpu=500m,memory=20Mi \
+--system-reserved=cpu=100m,memory=10Mi \
+--kubeconfig=/etc/kubernetes/$ROLE-kubeconfig.yml \
+--feature-gates=$FEATURE_GATES \
+--register-with-taints=$TAINTS \
+--logtostderr=true \
+--v=2 \
+"
+
+vault auth VAULT_TOKEN
+
+#API-Server cert and key
+mkdir -p /srv/kubernetes
+DATA=$(vault write --format=json kubernetes/issue/$ROLE common_name="$USER" ttl=8760h)
+echo $DATA|jq -r .data.issuing_ca > /srv/kubernetes/$ROLE-ca.pem
+echo $DATA|jq -r .data.certificate > /srv/kubernetes/$ROLE-cert.pem
+echo $DATA|jq -r .data.private_key > /srv/kubernetes/$ROLE-key.pem
+
+mkdir -p /etc/kubernetes
+kubectl config set-cluster kubernetes \
+    --certificate-authority=/srv/kubernetes/$ROLE-ca.pem \
+    --server=$KUBERNETES_MASTER \
+    --kubeconfig=/etc/kubernetes/$ROLE-kubeconfig.yml
+kubectl config set-credentials $USER \
+    --client-certificate=/srv/kubernetes/$ROLE-cert.pem \
+    --client-key=/srv/kubernetes/$ROLE-key.pem \
+    --kubeconfig=/etc/kubernetes/$ROLE-kubeconfig.yml
+kubectl config set-context default \
+    --cluster=kubernetes \
+    --user=$USER \
+    --kubeconfig=/etc/kubernetes/$ROLE-kubeconfig.yml
+kubectl config use-context default --kubeconfig=/etc/kubernetes/$ROLE-kubeconfig.yml
+
+#setup cgroups
+for cgroup in /sys/fs/cgroup/*; do
+  if [ -d $cgroup ]; then
+    mkdir -p $cgroup/kubepods
+  fi
+done
+
+exec 2>&1
+exec kubelet ${KUBELET_OPTS}

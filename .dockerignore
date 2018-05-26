@@ -1,5 +1,6 @@
 .idea
-etcd-data/
-vault-data/
+etcd-data
+vault-data
+pki-data
 .git
 **/node_modules

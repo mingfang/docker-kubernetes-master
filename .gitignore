@@ -1,5 +1,4 @@
 .idea
-etcd-data/member
-vault-data/core
-vault-data/logical
-vault-data/sys
+etcd-data
+vault-data
+pki-data

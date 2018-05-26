@@ -1,21 +1,58 @@
 #!/bin/bash
 
-FEATURE_GATES="ReadOnlyAPIDataVolumes=false,SupportIPVSProxyMode=true,PodPriority=true,PersistentLocalVolumes=true,VolumeScheduling=true,ServiceProxyAllowExternalIPs=true"
+KUBERNETES_MASTER=localhost
+NODE_NAME="${NODE_NAME=`hostname -s`}"
+
+FEATURE_GATES="ReadOnlyAPIDataVolumes=false,SupportIPVSProxyMode=true,PodPriority=true,PersistentLocalVolumes=true,VolumeScheduling=true,ServiceProxyAllowExternalIPs=true,TaintNodesByCondition=true,TaintBasedEvictions=true"
+
+LABELS="$LABELS,zone=master,kubernetes.io/role=master,dedicated=master"
+TAINTS="dedicated=master:NoSchedule"
+
+echo "KUBERNETES_MASTER=$KUBERNETES_MASTER"
+echo "LABELS=$LABELS"
+echo "TAINTS=$TAINTS"
+if ! grep "/var/lib/kubelet " /proc/self/mountinfo | grep shared; then
+  echo "Making /var/lib/kubelet shared."
+  mkdir -p /var/lib/kubelet
+  mount --bind /var/lib/kubelet /var/lib/kubelet
+  mount --make-shared /var/lib/kubelet
+fi
+rpc.statd
+swapoff -a
+
+mkdir -p /local-data
 
 docker rm -f kmaster
 docker run \
-       -e KUBERNETES_MASTER="$KUBERNETES_MASTER" \
+       --name kmaster \
+       -e LABELS="$LABELS" \
+       -e TAINTS="$TAINTS" \
+       -e KUBERNETES_MASTER="http://$KUBERNETES_MASTER:8080" \
+       -e NODE_NAME="$NODE_NAME" \
        -e REGION="$REGION" \
        -e VPC_ID="$VPC_ID" \
        -e ALT_NAMES="$ALT_NAMES" \
        -e FEATURE_GATES="$FEATURE_GATES" \
-       --name kmaster \
+       -e CLUSTER_CIDR="250.0.0.0/8" \
+       -e VAULT_ADDR="http://$KUBERNETES_MASTER:8200" \
+       -e VAULT_TOKEN="$VAULT_TOKEN" \
        --net=host \
+       --pid=host \
+       --privileged=true \
+       -p 10250:10250 \
        -p 4001:4001 \
        -p 8080:8080 \
        -p 8200:8200 \
+       -v /sys:/sys:rw \
+       -v /:/rootfs:ro \
+       -v /dev:/dev:rw \
+       -v /lib/modules:/lib/modules:ro \
+       -v /var/run:/var/run:rw \
+       -v /var/lib/docker/:/var/lib/docker:rw \
+       -v /var/lib/kubelet/:/var/lib/kubelet:rw,shared \
        -v `pwd`/etcd-data:/var/lib/etcd-data \
        -v `pwd`/vault-data:/var/lib/vault-data \
        -v `pwd`/pki-data:/srv/kubernetes \
        -v /var/log:/var/log \
+       -v /local-data/:/local-data:rw,shared \
        -d kubernetes-master

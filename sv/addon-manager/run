@@ -1,0 +1,6 @@
+#!/bin/bash
+
+source /etc/envvars
+
+exec 2>&1
+exec /opt/kube-addons.sh
