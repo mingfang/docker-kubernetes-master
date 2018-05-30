@@ -31,7 +31,9 @@ KUBELET_OPTS="\
 --v=2 \
 "
 
-vault auth VAULT_TOKEN
+until [ -f /dev/shm/KUBELET_TOKEN ]; do echo "Waiting for KUBELET_TOKEN..."; sleep 3; done
+grep "token " /dev/shm/KUBELET_TOKEN | awk '{print $2}' | xargs vault auth
+rm /dev/shm/KUBELET_TOKEN
 
 #API-Server cert and key
 mkdir -p /srv/kubernetes

@@ -18,7 +18,9 @@ KUBE_PROXY_OPTS="\
 --v=2 \
 "
 
-vault auth VAULT_TOKEN
+until [ -f /dev/shm/KUBE_PROXY_TOKEN ]; do echo "Waiting for KUBE_PROXY_TOKEN..."; sleep 3; done
+grep "token " /dev/shm/KUBE_PROXY_TOKEN | awk '{print $2}' | xargs vault auth
+rm /dev/shm/KUBE_PROXY_TOKEN
 
 #API-Server cert and key
 mkdir -p /srv/kubernetes
