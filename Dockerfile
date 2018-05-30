@@ -55,15 +55,6 @@ RUN mv /etcd* /etcd && \
     ln -s /etcd/etcdctl /usr/local/bin/etcdctl
 RUN mkdir -p /var/lib/etcd-data
 
-#Influxdb
-RUN wget https://dl.influxdata.com/influxdb/releases/influxdb_1.5.1_amd64.deb && \
-    dpkg -i influxdb*.deb && \
-    rm influxdb*.deb
-
-#Heapster
-COPY heapster /heapster
-COPY --from=gcr.io/google_containers/heapster:v1.5.2 heapster /heapster/heapster
-
 #Kubernetes
 RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.10.3/bin/linux/amd64/kube-apiserver
 RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.10.3/bin/linux/amd64/kube-controller-manager
