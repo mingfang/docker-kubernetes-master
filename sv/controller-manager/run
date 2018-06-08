@@ -2,10 +2,10 @@
 
 source /etc/envvars
 
-until curl -s $KUBERNETES_MASTER; do echo "Waiting for API Server..."; sleep 3; done;
+until curl -s http://localhost:8080; do echo "Waiting for API Server..."; sleep 3; done;
 
 KUBE_CONTROLLER_MANAGER_OPTS="\
---master=$KUBERNETES_MASTER \
+--master=http://localhost:8080 \
 --root-ca-file=/srv/kubernetes/api-server-ca.pem \
 --service-account-private-key-file=/srv/kubernetes/api-server-key.pem \
 --feature-gates=$FEATURE_GATES \

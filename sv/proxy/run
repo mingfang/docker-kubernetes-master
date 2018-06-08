@@ -2,7 +2,7 @@
 
 source /etc/envvars
 
-until curl -s $KUBERNETES_MASTER; do echo "Waiting for API Server..."; sleep 3; done;
+until curl -s http://localhost:8080; do echo "Waiting for API Server..."; sleep 3; done;
 
 export ROLE=kube-proxy
 export USER=system:kube-proxy
@@ -19,7 +19,7 @@ KUBE_PROXY_OPTS="\
 
 mkdir -p /etc/kubernetes
 kubectl config set-cluster kubernetes \
-    --server=$KUBERNETES_MASTER \
+    --server=http://localhost:8080 \
     --kubeconfig=/etc/kubernetes/$ROLE-kubeconfig.yml
 kubectl config set-context default \
     --cluster=kubernetes \

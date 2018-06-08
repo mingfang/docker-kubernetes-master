@@ -1,6 +1,5 @@
 #!/bin/bash
 
-KUBERNETES_MASTER=localhost
 NODE_NAME="${NODE_NAME=`hostname -s`}"
 FEATURE_GATES="ReadOnlyAPIDataVolumes=false,SupportIPVSProxyMode=true,PodPriority=true,PersistentLocalVolumes=true,VolumeScheduling=true,ServiceProxyAllowExternalIPs=true,TaintNodesByCondition=true,TaintBasedEvictions=true"
 
@@ -25,7 +24,7 @@ docker run \
        --name kmaster \
        -e LABELS="$LABELS" \
        -e TAINTS="$TAINTS" \
-       -e KUBERNETES_MASTER="http://$KUBERNETES_MASTER:8080" \
+       -e KUBERNETES_MASTER="$KUBERNETES_MASTER" \
        -e NODE_NAME="$NODE_NAME" \
        -e REGION="$REGION" \
        -e VPC_ID="$VPC_ID" \

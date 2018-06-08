@@ -2,11 +2,11 @@
 
 source /etc/envvars
 
-until curl -s $KUBERNETES_MASTER; do echo "Waiting for API Server..."; sleep 3; done;
+until curl -s http://localhost:8080; do echo "Waiting for API Server..."; sleep 3; done;
 
 KUBE_SCHEDULER_OPTS="\
   --logtostderr=true \
-  --master=$KUBERNETES_MASTER \
+  --master=http://localhost:8080 \
   --feature-gates=$FEATURE_GATES \
   --policy-config-file=${SCHEDULER_POLICY_FILE} \
   --v=2"
