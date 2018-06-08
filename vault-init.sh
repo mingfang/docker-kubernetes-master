@@ -101,10 +101,6 @@ fi
 
 #setup token for kmaster
 vault token-create -role="kube-apiserver" > /dev/shm/KMASTER_TOKEN
-#setup token for kubelet
-vault token-create -role="kubelet" > /dev/shm/KUBELET_TOKEN
-#setup token for kube-proxy
-vault token-create -role="kube-proxy" > /dev/shm/KUBE_PROXY_TOKEN
 
 #cluster-admin pki role
 vault write kubernetes/roles/cluster-admin organization="system:masters" allow_any_name=true enforce_hostnames=false max_ttl="87600h"

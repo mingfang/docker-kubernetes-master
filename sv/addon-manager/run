@@ -2,5 +2,7 @@
 
 source /etc/envvars
 
+until curl -s $KUBERNETES_MASTER; do echo "Waiting for API Server..."; sleep 3; done;
+
 exec 2>&1
 exec /opt/kube-addons.sh
