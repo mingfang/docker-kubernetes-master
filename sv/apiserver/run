@@ -56,7 +56,7 @@ rm /dev/shm/CLUSTER_ADMIN_TOKEN
 
 #cluster-admin cert and key
 mkdir -p $PKI_DIR
-if [ ! -f $PKI_DIR/cluster-admin-ca.pem ]; then
+if [ ! -f $PKI_DIR/cluster-admin-key.pem ]; then
   DATA=$(vault write --format=json kubernetes/issue/cluster-admin common_name=cluster-admin ttl=8760h)
   echo $DATA|jq -r .data.issuing_ca > $PKI_DIR/cluster-admin-ca.pem
   echo $DATA|jq -r .data.certificate > $PKI_DIR/cluster-admin-cert.pem
