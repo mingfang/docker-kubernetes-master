@@ -43,7 +43,7 @@ RUN apt-get install -y ethtool
 RUN apt-get install -y ipvsadm ipset
 
 #Vault
-RUN wget https://releases.hashicorp.com/vault/0.9.5/vault_0.9.5_linux_amd64.zip && \
+RUN wget https://releases.hashicorp.com/vault/0.10.2/vault_0.10.2_linux_amd64.zip && \
     unzip vault*.zip && \
     rm vault*.zip && \
     mv vault /usr/local/bin/
