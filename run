@@ -34,8 +34,6 @@ docker run \
        -e ALT_NAMES="$ALT_NAMES" \
        -e FEATURE_GATES="$FEATURE_GATES" \
        -e CLUSTER_CIDR="250.0.0.0/8" \
-       -e VAULT_ADDR="http://$KUBERNETES_MASTER:8200" \
-       -e VAULT_TOKEN="$VAULT_TOKEN" \
        --net=host \
        --pid=host \
        --privileged=true \
