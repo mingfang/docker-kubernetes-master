@@ -4,5 +4,9 @@ source /etc/envvars
 
 until curl -s http://localhost:8080; do echo "Waiting for API Server..."; sleep 3; done;
 
+kubectl config set-cluster local --server=http://localhost:8080
+kubectl config set-context local --cluster=local
+kubectl config use-context local
+
 exec 2>&1
 exec /opt/kube-addons.sh
