@@ -49,7 +49,7 @@ RUN wget https://releases.hashicorp.com/vault/0.9.5/vault_0.9.5_linux_amd64.zip 
     mv vault /usr/local/bin/
 
 #Etcd
-RUN wget -O - https://github.com/coreos/etcd/releases/download/v3.3.3/etcd-v3.3.3-linux-amd64.tar.gz | tar zx
+RUN wget -O - https://github.com/coreos/etcd/releases/download/v3.3.7/etcd-v3.3.7-linux-amd64.tar.gz | tar zx
 RUN mv /etcd* /etcd && \
     ln -s /etcd/etcd /usr/local/bin/etcd && \
     ln -s /etcd/etcdctl /usr/local/bin/etcdctl
