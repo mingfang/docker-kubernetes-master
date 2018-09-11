@@ -65,8 +65,8 @@ RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/rel
 RUN chmod +x /usr/local/bin/kube*
 
 #Addon Manager
-COPY --from=gcr.io/google-containers/kube-addon-manager:v8.6 /opt/kube-addons.sh /opt/kube-addons.sh
-COPY --from=gcr.io/google-containers/kube-addon-manager:v8.6 /opt/namespace.yaml /opt/namespace.yaml 
+COPY --from=gcr.io/google-containers/kube-addon-manager:v8.7 /opt/kube-addons.sh /opt/kube-addons.sh
+COPY --from=gcr.io/google-containers/kube-addon-manager:v8.7 /opt/namespace.yaml /opt/namespace.yaml
 
 #Vault
 RUN mkdir -p /srv/kubernetes
