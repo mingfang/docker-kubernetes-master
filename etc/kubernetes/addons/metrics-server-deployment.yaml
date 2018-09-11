@@ -53,6 +53,7 @@ spec:
         command:
         - /metrics-server
         - --metric-resolution=30s
+        - --kubelet-insecure-tls
         ports:
         - containerPort: 443
           name: https
