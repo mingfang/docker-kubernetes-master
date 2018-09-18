@@ -19,11 +19,6 @@ RUN apt-get install -y --no-install-recommends vim less net-tools inetutils-ping
 #Proxy needs iptables
 RUN apt-get install -y --no-install-recommends iptables conntrack
 
-#Dnsmasq and Confd used for DNS
-RUN apt-get install -y --no-install-recommends dnsmasq
-RUN wget -O /usr/local/bin/confd  https://github.com/kelseyhightower/confd/releases/download/v0.15.0/confd-0.15.0-linux-amd64 && \
-    chmod +x /usr/local/bin/confd
-
 #ZFS
 RUN apt-get install -y --no-install-recommends zfsutils-linux
 
@@ -48,6 +43,18 @@ RUN wget https://releases.hashicorp.com/vault/0.10.2/vault_0.10.2_linux_amd64.zi
     rm vault*.zip && \
     mv vault /usr/local/bin/
 
+#Docker client only
+RUN wget -O - https://get.docker.com/builds/Linux/x86_64/docker-latest.tgz | tar zx -C /usr/local/bin --strip-components=1 docker/docker
+
+#Kubernetes
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.11.3/bin/linux/amd64/kubelet
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.11.3/bin/linux/amd64/kube-proxy
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.11.3/bin/linux/amd64/kubectl
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.11.3/bin/linux/amd64/kube-apiserver
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.11.3/bin/linux/amd64/kube-controller-manager
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.11.3/bin/linux/amd64/kube-scheduler
+RUN chmod +x /usr/local/bin/kube*
+
 #Etcd
 RUN wget -O - https://github.com/coreos/etcd/releases/download/v3.3.7/etcd-v3.3.7-linux-amd64.tar.gz | tar zx
 RUN mv /etcd* /etcd && \
@@ -55,14 +62,6 @@ RUN mv /etcd* /etcd && \
     ln -s /etcd/etcdctl /usr/local/bin/etcdctl
 RUN mkdir -p /var/lib/etcd-data
 
-#Kubernetes
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.11.3/bin/linux/amd64/kube-apiserver
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.11.3/bin/linux/amd64/kube-controller-manager
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.11.3/bin/linux/amd64/kube-scheduler
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.11.3/bin/linux/amd64/kubelet
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.11.3/bin/linux/amd64/kube-proxy
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.11.3/bin/linux/amd64/kubectl
-RUN chmod +x /usr/local/bin/kube*
 
 #Addon Manager
 COPY --from=gcr.io/google-containers/kube-addon-manager:v8.7 /opt/kube-addons.sh /opt/kube-addons.sh
