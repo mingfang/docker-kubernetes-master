@@ -13,6 +13,7 @@ KUBE_CONTROLLER_MANAGER_OPTS="\
 --pod-eviction-timeout=300s \
 --terminated-pod-gc-threshold 100 \
 --horizontal-pod-autoscaler-use-rest-clients=true \
+--flex-volume-plugin-dir=/var/lib/kubelet/volumeplugins \
 --logtostderr=true \
 "
 
