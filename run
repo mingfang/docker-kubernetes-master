@@ -1,7 +1,7 @@
 #!/bin/bash
 
 NODE_NAME="${NODE_NAME=`hostname -s`}"
-FEATURE_GATES="ReadOnlyAPIDataVolumes=false,SupportIPVSProxyMode=true,PodPriority=true,PersistentLocalVolumes=true,VolumeScheduling=true,ServiceProxyAllowExternalIPs=true,TaintNodesByCondition=true,TaintBasedEvictions=true"
+FEATURE_GATES="SupportIPVSProxyMode=true,PodPriority=true,PersistentLocalVolumes=true,VolumeScheduling=true,TaintNodesByCondition=true,TaintBasedEvictions=true"
 
 LABELS="$LABELS,zone=master,kubernetes.io/role=master,dedicated=master"
 TAINTS="dedicated=master:NoSchedule"
