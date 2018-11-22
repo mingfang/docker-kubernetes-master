@@ -56,7 +56,7 @@ RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/rel
 RUN chmod +x /usr/local/bin/kube*
 
 #Etcd
-RUN wget -O - https://github.com/coreos/etcd/releases/download/v3.3.7/etcd-v3.3.7-linux-amd64.tar.gz | tar zx
+RUN wget -O - https://github.com/coreos/etcd/releases/download/v3.3.10/etcd-v3.3.10-linux-amd64.tar.gz | tar zx
 RUN mv /etcd* /etcd && \
     ln -s /etcd/etcd /usr/local/bin/etcd && \
     ln -s /etcd/etcdctl /usr/local/bin/etcdctl
