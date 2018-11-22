@@ -64,8 +64,8 @@ RUN mkdir -p /var/lib/etcd-data
 
 
 #Addon Manager
-COPY --from=gcr.io/google-containers/kube-addon-manager:v8.7 /opt/kube-addons.sh /opt/kube-addons.sh
-COPY --from=gcr.io/google-containers/kube-addon-manager:v8.7 /opt/namespace.yaml /opt/namespace.yaml
+COPY --from=gcr.io/google-containers/kube-addon-manager:v8.9 /opt/kube-addons.sh /opt/kube-addons.sh
+COPY --from=gcr.io/google-containers/kube-addon-manager:v8.9 /opt/namespace.yaml /opt/namespace.yaml
 
 #Vault
 RUN mkdir -p /srv/kubernetes
