@@ -87,7 +87,7 @@ spec:
           - --memory=40Mi
           - --extra-memory=4Mi
           - --threshold=5
-          - --deployment=metrics-server-v0.3.0
+          - --deployment=metrics-server-v0.3.1
           - --container=metrics-server
           - --poll-period=300000
           - --estimator=exponential
@@ -99,5 +99,7 @@ spec:
           configMap:
             name: metrics-server-config
       tolerations:
+        - key: node-role.kubernetes.io/master
+          effect: NoSchedule
         - key: "CriticalAddonsOnly"
           operator: "Exists"
