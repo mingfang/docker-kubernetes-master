@@ -29,7 +29,7 @@ KUBE_APISERVER_OPTS="\
 --proxy-client-cert-file=$PKI_DIR/api-server-cert.pem \
 --proxy-client-key-file=$PKI_DIR/api-server-key.pem \
 --enable-aggregator-routing=true \
---storage-backend=etcd2 \
+--storage-backend=etcd3 \
 --storage-media-type=application/json \
 --event-ttl=1h \
 --enable-swagger-ui=true \
@@ -65,7 +65,7 @@ fi
 
 export ROLE=cluster-admin
 export USER=cluster-admin
-export KUBERNETES_MASTER=${KUBERNETES_MASTER="https://$HOSTNAME:$SECURE_PORT"}
+export KUBERNETES_MASTER="${KUBERNETES_MASTER:-https://$HOSTNAME:$SECURE_PORT}"
 
 mkdir -p $PKI_DIR
 kubectl config set-cluster kubernetes \
