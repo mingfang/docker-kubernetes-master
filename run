@@ -1,10 +1,10 @@
 #!/bin/bash
 
-NODE_NAME="${NODE_NAME=`hostname -s`}"
+NODE_NAME="${NODE_NAME:-$(hostname -s)}"
 FEATURE_GATES="SupportIPVSProxyMode=true,PodPriority=true,PersistentLocalVolumes=true,VolumeScheduling=true,TaintNodesByCondition=true,TaintBasedEvictions=true"
 
-LABELS="$LABELS,zone=master,kubernetes.io/role=master,dedicated=master"
-TAINTS="dedicated=master:NoSchedule"
+LABELS="$LABELS,zone=master,node-role.kubernetes.io/master=true"
+TAINTS="node-role.kubernetes.io/master=:NoSchedule,CriticalAddonsOnly=:NoSchedule"
 
 echo "KUBERNETES_MASTER=$KUBERNETES_MASTER"
 echo "LABELS=$LABELS"
@@ -30,7 +30,7 @@ docker run \
        -e VPC_ID="$VPC_ID" \
        -e FEATURE_GATES="$FEATURE_GATES" \
        -e CLUSTER_CIDR="250.0.0.0/8" \
-       -e ALT_NAMES="$ALT_NAMES" \
+       -e ALT_NAMES="$(hostname),$(hostname -I|tr ' ' ','),$ALT_NAMES" \
        --net=host \
        --pid=host \
        --privileged=true \
