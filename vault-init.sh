@@ -99,9 +99,6 @@ EOT
 vault write auth/aws/role/knode auth_type=ec2 bound_vpc_id="$VPC_ID" policies="aws/policy/knode,kubernetes/policy/kubelet,kubernetes/policy/kube-proxy"
 fi
 
-#setup token for kmaster
-vault token-create -role="kube-apiserver" > /dev/shm/KMASTER_TOKEN
-
 #cluster-admin pki role
 vault write kubernetes/roles/cluster-admin organization="system:masters" allow_any_name=true enforce_hostnames=false max_ttl="87600h"
 
@@ -118,5 +115,9 @@ EOT
 #cluster-admin auth role
 vault write auth/token/roles/cluster-admin period="87600h" orphan=true allowed_policies="kubernetes/policy/cluster-admin"
 
+#setup token for kmaster
+vault token-create -role="kube-apiserver" > /dev/shm/KMASTER_TOKEN
+#setup token for kubelet
+vault token-create -role="kubelet" > /dev/shm/KUBELET_TOKEN
 #setup token for cluster-admin
 vault token-create -role="cluster-admin" > /dev/shm/CLUSTER_ADMIN_TOKEN
