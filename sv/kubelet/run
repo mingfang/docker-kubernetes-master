@@ -4,6 +4,7 @@ source /etc/envvars
 
 until curl -s http://localhost:8080; do echo "Waiting for API Server..."; sleep 3; done;
 
+export PKI_DIR=/dev/shm/kubernetes
 export IP=`ip route get 1 | awk '{print $7;exit}'`
 export ROLE=kubelet
 export USER="system:node:$NODE_NAME"
@@ -23,27 +24,46 @@ KUBELET_OPTS="\
 --hairpin-mode=hairpin-veth \
 --serialize-image-pulls=false \
 --node-labels=host=${HOST},${LABELS} \
---allow-privileged=true \
+--allow-privileged=false \
 --pod-manifest-path=/etc/kubernetes/manifests \
 --kube-reserved=cpu=100m,memory=100Mi \
 --system-reserved=cpu=100m,memory=100Mi \
---kubeconfig=/etc/kubernetes/$ROLE-kubeconfig.yml \
+--kubeconfig=$PKI_DIR/$ROLE-kubeconfig.yml \
 --feature-gates=$FEATURE_GATES \
 --register-with-taints=$TAINTS \
 --volume-plugin-dir=/var/lib/kubelet/volumeplugins \
+--anonymous-auth=false \
+--client-ca-file=$PKI_DIR/$ROLE-ca.pem \
 --logtostderr=true \
 --v=2 \
 "
 
-mkdir -p /etc/kubernetes
+grep "token " /dev/shm/KUBELET_TOKEN | awk '{print $2}' | xargs vault login
+rm /dev/shm/KUBELET_TOKEN
+
+#API-Server cert and key
+mkdir -p $PKI_DIR
+if [ ! -f $PKI_DIR/$ROLE-key.pem ]; then
+  DATA=$(vault write --format=json kubernetes/issue/$ROLE common_name="$USER" ttl=8760h)
+  echo $DATA|jq -r .data.issuing_ca > $PKI_DIR/$ROLE-ca.pem
+  echo $DATA|jq -r .data.certificate > $PKI_DIR/$ROLE-cert.pem
+  echo $DATA|jq -r .data.private_key > $PKI_DIR/$ROLE-key.pem
+fi
+
+mkdir -p $PKI_DIR
 kubectl config set-cluster kubernetes \
-    --server=http://localhost:8080 \
-    --kubeconfig=/etc/kubernetes/$ROLE-kubeconfig.yml
+    --certificate-authority=$PKI_DIR/$ROLE-ca.pem \
+    --server=https://$HOSTNAME:6443 \
+    --kubeconfig=$PKI_DIR/$ROLE-kubeconfig.yml
+kubectl config set-credentials $USER \
+    --client-certificate=$PKI_DIR/$ROLE-cert.pem \
+    --client-key=$PKI_DIR/$ROLE-key.pem \
+    --kubeconfig=$PKI_DIR/$ROLE-kubeconfig.yml
 kubectl config set-context default \
     --cluster=kubernetes \
     --user=$USER \
-    --kubeconfig=/etc/kubernetes/$ROLE-kubeconfig.yml
-kubectl config use-context default --kubeconfig=/etc/kubernetes/$ROLE-kubeconfig.yml
+    --kubeconfig=$PKI_DIR/$ROLE-kubeconfig.yml
+kubectl config use-context default --kubeconfig=$PKI_DIR/$ROLE-kubeconfig.yml
 
 #setup cgroups
 for cgroup in /sys/fs/cgroup/*; do

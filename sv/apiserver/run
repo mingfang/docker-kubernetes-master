@@ -4,7 +4,8 @@ sv start etcd || exit 1
 
 source /etc/envvars
 
-export PKI_DIR=/srv/kubernetes
+export PKI_DIR=/dev/shm/kubernetes
+export ROLE=api-server
 export SECURE_PORT=6443
 
 KUBE_APISERVER_OPTS="\
@@ -18,16 +19,18 @@ KUBE_APISERVER_OPTS="\
 --allow-privileged=true \
 --anonymous-auth=false \
 --runtime-config="api/all,settings.k8s.io/v1alpha1,scheduling.k8s.io/v1alpha1" \
---client-ca-file=$PKI_DIR/api-server-ca.pem \
---tls-cert-file=$PKI_DIR/api-server-cert.pem \
---tls-private-key-file=$PKI_DIR/api-server-key.pem \
---requestheader-client-ca-file=$PKI_DIR/api-server-ca.pem \
+--client-ca-file=$PKI_DIR/$ROLE-ca.pem \
+--tls-cert-file=$PKI_DIR/$ROLE-cert.pem \
+--tls-private-key-file=$PKI_DIR/$ROLE-key.pem \
+--requestheader-client-ca-file=$PKI_DIR/$ROLE-ca.pem \
 --requestheader-allowed-names= \
 --requestheader-extra-headers-prefix=X-Remote-Extra- \
 --requestheader-group-headers=X-Remote-Group \
 --requestheader-username-headers=X-Remote-User \
---proxy-client-cert-file=$PKI_DIR/api-server-cert.pem \
---proxy-client-key-file=$PKI_DIR/api-server-key.pem \
+--kubelet-client-certificate=$PKI_DIR/$ROLE-cert.pem \
+--kubelet-client-key=$PKI_DIR/$ROLE-key.pem \
+--proxy-client-cert-file=$PKI_DIR/$ROLE-cert.pem \
+--proxy-client-key-file=$PKI_DIR/$ROLE-key.pem \
 --enable-aggregator-routing=true \
 --storage-backend=etcd3 \
 --storage-media-type=application/json \
@@ -44,11 +47,11 @@ rm /dev/shm/KMASTER_TOKEN
 
 #API-Server cert and key
 mkdir -p $PKI_DIR
-if [ ! -f $PKI_DIR/api-server-ca.pem ]; then
+if [ ! -f $PKI_DIR/$ROLE-ca.pem ]; then
   DATA=$(vault write --format=json kubernetes/issue/kube-apiserver common_name=kubernetes alt_names="kubernetes.default,kubernetes.default.svc,kubernetes.default.svc.cluster,kubernetes.default.svc.cluster.local,${ALT_NAMES}" ip_sans="172.27.0.1" ttl=8760h)
-  echo $DATA|jq -r .data.issuing_ca > $PKI_DIR/api-server-ca.pem
-  echo $DATA|jq -r .data.certificate > $PKI_DIR/api-server-cert.pem
-  echo $DATA|jq -r .data.private_key > $PKI_DIR/api-server-key.pem
+  echo $DATA|jq -r .data.issuing_ca > $PKI_DIR/$ROLE-ca.pem
+  echo $DATA|jq -r .data.certificate > $PKI_DIR/$ROLE-cert.pem
+  echo $DATA|jq -r .data.private_key > $PKI_DIR/$ROLE-key.pem
 fi
 
 grep "token " /dev/shm/CLUSTER_ADMIN_TOKEN | awk '{print $2}' | xargs vault auth
