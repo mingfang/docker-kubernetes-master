@@ -5,6 +5,8 @@ sleep 10
 
 VAULT_DATA=/var/lib/vault-data
 mkdir -p $VAULT_DATA
+PKI_DIR=/dev/shm/kubernetes
+mkdir -p $PKI_DIR
 
 if [ ! "$(ls $VAULT_DATA)" ]; then
     echo "Initializing Vault..."
@@ -75,9 +77,11 @@ vault write auth/token/roles/kubelet period="87600h" orphan=true allowed_policie
 vault write auth/token/roles/kube-proxy period="87600h" orphan=true allowed_policies="kubernetes/policy/kube-proxy"
 
 #service account secret key
-#openssl genrsa 4096 > $VAULT_DATA/service-account-key
-#vault write secret/kubernetes/service-account-key key=@$VAULT_DATA/service-account-key
-#rm $VAULT_DATA/service-account-key
+vault read -field key secret/kubernetes/service-account-key > $PKI_DIR/service-account-key.pem
+if [[ ! -s $PKI_DIR/service-account-key.pem ]]; then
+  openssl genrsa 4096 | vault write secret/kubernetes/service-account-key key=-
+  vault read -field key secret/kubernetes/service-account-key > $PKI_DIR/service-account-key.pem
+fi
 
 if [ "$VPC_ID" ]; then
 #enable AWS integration

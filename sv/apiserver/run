@@ -22,6 +22,7 @@ KUBE_APISERVER_OPTS="\
 --client-ca-file=$PKI_DIR/$ROLE-ca.pem \
 --tls-cert-file=$PKI_DIR/$ROLE-cert.pem \
 --tls-private-key-file=$PKI_DIR/$ROLE-key.pem \
+--service-account-key-file=$PKI_DIR/service-account-key.pem \
 --requestheader-client-ca-file=$PKI_DIR/$ROLE-ca.pem \
 --requestheader-allowed-names= \
 --requestheader-extra-headers-prefix=X-Remote-Extra- \
