@@ -48,7 +48,6 @@ docker run \
        -v /var/lib/kubelet/volumeplugins:/var/lib/kubelet/volumeplugins:rw \
        -v `pwd`/etcd-data:/var/lib/etcd-data \
        -v `pwd`/vault-data:/var/lib/vault-data \
-       -v `pwd`/pki-data:/srv/kubernetes \
        -v /var/log:/var/log \
        -v /local-data/:/local-data:rw,shared \
        -d kubernetes-master
