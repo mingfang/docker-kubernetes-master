@@ -2,15 +2,16 @@
 
 source /etc/envvars
 
-until curl -s http://localhost:8080; do echo "Waiting for API Server..."; sleep 3; done;
+until curl -k -s https://localhost:6443; do echo "Waiting for API Server..."; sleep 3; done;
 
 export PKI_DIR=/dev/shm/kubernetes
-export IP=`ip route get 1 | awk '{print $7;exit}'`
 export ROLE=kubelet
 export USER="system:node:$NODE_NAME"
 
-mkdir -p /etc/kubernetes/manifests
+export IP=`ip route get 1 | awk '{print $7;exit}'`
 HOST=`hostname -s`
+mkdir -p /etc/kubernetes/manifests
+
 KUBELET_OPTS="\
 --hostname_override=$NODE_NAME \
 --address=0.0.0.0 \
@@ -37,18 +38,6 @@ KUBELET_OPTS="\
 --logtostderr=true \
 --v=2 \
 "
-
-grep "token " /dev/shm/KUBELET_TOKEN | awk '{print $2}' | xargs vault login
-rm /dev/shm/KUBELET_TOKEN
-
-#API-Server cert and key
-mkdir -p $PKI_DIR
-if [ ! -f $PKI_DIR/$ROLE-key.pem ]; then
-  DATA=$(vault write --format=json kubernetes/issue/$ROLE common_name="$USER" ttl=8760h)
-  echo $DATA|jq -r .data.issuing_ca > $PKI_DIR/$ROLE-ca.pem
-  echo $DATA|jq -r .data.certificate > $PKI_DIR/$ROLE-cert.pem
-  echo $DATA|jq -r .data.private_key > $PKI_DIR/$ROLE-key.pem
-fi
 
 mkdir -p $PKI_DIR
 kubectl config set-cluster kubernetes \

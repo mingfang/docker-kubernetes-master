@@ -2,7 +2,7 @@
 
 source /etc/envvars
 
-until curl -s http://localhost:8080; do echo "Waiting for API Server..."; sleep 3; done;
+until curl -k -s https://localhost:6443; do echo "Waiting for API Server..."; sleep 3; done;
 
 KUBE_SCHEDULER_OPTS="\
   --logtostderr=true \

@@ -1,11 +1,9 @@
 #!/bin/bash
 
-sv start etcd || exit 1
-
 source /etc/envvars
 
 export PKI_DIR=/dev/shm/kubernetes
-export ROLE=api-server
+export ROLE=apiserver
 export SECURE_PORT=6443
 
 KUBE_APISERVER_OPTS="\
@@ -42,52 +40,6 @@ KUBE_APISERVER_OPTS="\
 "
 
 /vault-init.sh
-
-grep "token " /dev/shm/KMASTER_TOKEN | awk '{print $2}' | xargs vault auth
-rm /dev/shm/KMASTER_TOKEN
-
-#API-Server cert and key
-mkdir -p $PKI_DIR
-if [ ! -f $PKI_DIR/$ROLE-ca.pem ]; then
-  DATA=$(vault write --format=json kubernetes/issue/kube-apiserver common_name=kubernetes alt_names="kubernetes.default,kubernetes.default.svc,kubernetes.default.svc.cluster,kubernetes.default.svc.cluster.local,${ALT_NAMES}" ip_sans="172.27.0.1" ttl=8760h)
-  echo $DATA|jq -r .data.issuing_ca > $PKI_DIR/$ROLE-ca.pem
-  echo $DATA|jq -r .data.certificate > $PKI_DIR/$ROLE-cert.pem
-  echo $DATA|jq -r .data.private_key > $PKI_DIR/$ROLE-key.pem
-fi
-
-grep "token " /dev/shm/CLUSTER_ADMIN_TOKEN | awk '{print $2}' | xargs vault auth
-rm /dev/shm/CLUSTER_ADMIN_TOKEN
-
-#cluster-admin cert and key
-mkdir -p $PKI_DIR
-if [ ! -f $PKI_DIR/cluster-admin-key.pem ]; then
-  DATA=$(vault write --format=json kubernetes/issue/cluster-admin common_name=cluster-admin ttl=8760h)
-  echo $DATA|jq -r .data.issuing_ca > $PKI_DIR/cluster-admin-ca.pem
-  echo $DATA|jq -r .data.certificate > $PKI_DIR/cluster-admin-cert.pem
-  echo $DATA|jq -r .data.private_key > $PKI_DIR/cluster-admin-key.pem
-fi
-
-export ROLE=cluster-admin
-export USER=cluster-admin
-export KUBERNETES_MASTER="${KUBERNETES_MASTER:-https://$HOSTNAME:$SECURE_PORT}"
-
-mkdir -p $PKI_DIR
-kubectl config set-cluster kubernetes \
-    --certificate-authority=$PKI_DIR/$ROLE-ca.pem \
-    --embed-certs=true \
-    --server=$KUBERNETES_MASTER \
-    --kubeconfig=$PKI_DIR/$ROLE-kubeconfig.yml
-kubectl config set-credentials $USER \
-    --client-certificate=$PKI_DIR/$ROLE-cert.pem \
-    --embed-certs=true \
-    --client-key=$PKI_DIR/$ROLE-key.pem \
-    --kubeconfig=$PKI_DIR/$ROLE-kubeconfig.yml
-kubectl config set-context default \
-    --cluster=kubernetes \
-    --user=$USER \
-    --kubeconfig=$PKI_DIR/$ROLE-kubeconfig.yml
-kubectl config use-context default --kubeconfig=$PKI_DIR/$ROLE-kubeconfig.yml
-rm $PKI_DIR/$ROLE*.pem
 
 exec 2>&1
 exec kube-apiserver ${KUBE_APISERVER_OPTS}

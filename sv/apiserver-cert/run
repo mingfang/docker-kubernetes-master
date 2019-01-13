@@ -1,0 +1,17 @@
+#!/bin/bash
+
+source /etc/envvars
+
+export ROLE=apiserver
+export CN=kubernetes
+export ALT_NAMES="kubernetes.default,kubernetes.default.svc,kubernetes.default.svc.cluster,kubernetes.default.svc.cluster.local,${ALT_NAMES}"
+export IP_SANS="172.27.0.1"
+export TTL=8760h
+export COMMAND="sv restart apiserver"
+
+export PKI_DIR=/dev/shm/kubernetes
+export VAULT_TOKEN=$(grep "token " $PKI_DIR/KMASTER_TOKEN | awk '{print $2}')
+rm $PKI_DIR/KMASTER_TOKEN
+
+exec 2>&1
+exec /consul-template.sh
