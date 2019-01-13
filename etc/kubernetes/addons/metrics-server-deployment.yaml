@@ -20,7 +20,7 @@ data:
     apiVersion: nannyconfig/v1alpha1
     kind: NannyConfiguration
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: metrics-server-v0.3.1
@@ -47,18 +47,12 @@ spec:
     spec:
       priorityClassName: system-cluster-critical
       serviceAccountName: metrics-server
-      tolerations:
-      - key: node.kubernetes.io/master
-        effect: NoSchedule
-      - key: "CriticalAddonsOnly"
-        operator: "Exists"
       containers:
       - name: metrics-server
         image: k8s.gcr.io/metrics-server-amd64:v0.3.1
         command:
         - /metrics-server
         - --metric-resolution=30s
-        - --kubelet-insecure-tls
         ports:
         - containerPort: 443
           name: https
@@ -103,3 +97,6 @@ spec:
         - name: metrics-server-config-volume
           configMap:
             name: metrics-server-config
+      tolerations:
+        - key: "CriticalAddonsOnly"
+          operator: "Exists"
