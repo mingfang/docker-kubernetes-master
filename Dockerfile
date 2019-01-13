@@ -38,21 +38,24 @@ RUN apt-get install -y ethtool
 RUN apt-get install -y ipvsadm ipset
 
 #Vault
-RUN wget https://releases.hashicorp.com/vault/0.11.5/vault_0.11.5_linux_amd64.zip && \
+RUN wget https://releases.hashicorp.com/vault/1.0.1/vault_1.0.1_linux_amd64.zip && \
     unzip vault*.zip && \
     rm vault*.zip && \
     mv vault /usr/local/bin/
+
+#Consul Template
+RUN wget -O - https://releases.hashicorp.com/consul-template/0.19.5/consul-template_0.19.5_linux_amd64.tgz | tar zx -C /usr/local/bin
 
 #Docker client only
 RUN wget -O - https://get.docker.com/builds/Linux/x86_64/docker-latest.tgz | tar zx -C /usr/local/bin --strip-components=1 docker/docker
 
 #Kubernetes
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.13.1/bin/linux/amd64/kubelet
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.13.1/bin/linux/amd64/kube-proxy
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.13.1/bin/linux/amd64/kubectl
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.13.1/bin/linux/amd64/kube-apiserver
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.13.1/bin/linux/amd64/kube-controller-manager
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.13.1/bin/linux/amd64/kube-scheduler
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.13.2/bin/linux/amd64/kubelet
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.13.2/bin/linux/amd64/kube-proxy
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.13.2/bin/linux/amd64/kubectl
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.13.2/bin/linux/amd64/kube-apiserver
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.13.2/bin/linux/amd64/kube-controller-manager
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.13.2/bin/linux/amd64/kube-scheduler
 RUN chmod +x /usr/local/bin/kube*
 
 #Etcd
@@ -72,6 +75,7 @@ RUN mkdir -p /srv/kubernetes
 COPY vault-init.sh /
 COPY vault.hcl /
 ENV VAULT_ADDR=http://0.0.0.0:8200
+COPY consul-template.sh /
 
 COPY etc/kubernetes/addons /etc/kubernetes/addons
 
