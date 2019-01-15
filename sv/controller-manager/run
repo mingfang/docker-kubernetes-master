@@ -8,10 +8,10 @@ export PKI_DIR=/dev/shm/kubernetes
 
 KUBE_CONTROLLER_MANAGER_OPTS="\
 --master=http://localhost:8080 \
---root-ca-file=$PKI_DIR/root_cert.pem \
---cluster-signing-cert-file=$PKI_DIR/cluster-signing-cert.pem \
---cluster-signing-key-file=$PKI_DIR/cluster-signing-key.pem \
+--root-ca-file=$PKI_DIR/kubernetes-ca.pem \
 --service-account-private-key-file=$PKI_DIR/service-account-key.pem \
+--cluster-signing-cert-file=$PKI_DIR/cluster-signing-ca.pem \
+--cluster-signing-key-file=$PKI_DIR/cluster-signing-key.pem \
 --feature-gates=$FEATURE_GATES \
 --node-monitor-grace-period=20s \
 --pod-eviction-timeout=300s \

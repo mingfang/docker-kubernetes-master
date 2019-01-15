@@ -4,18 +4,23 @@ set -e
 # VAULT_TOKEN=$(grep "token " /dev/shm/kubernetes/KUBELET_TOKEN | awk '{print $2}') ROLE=kubelet CN=kubelet bash -x consul-template.sh
 
 cat <<EOF >/tmp/${ROLE}-ca.tpl
-{{ with secret "kubernetes/issue/${ROLE}" "common_name=${CN}" "alt_names=${ALT_NAMES}" "ip_sans=${IP_SANS}" "ttl=${TTL}" }}
-{{ .Data.issuing_ca }}{{ end }}
+{{ with secret "kubernetes/issue/${ROLE}" "common_name=${CN}" "alt_names=${ALT_NAMES}" "ip_sans=${IP_SANS}" "ttl=${TTL}" -}}
+{{ range .Data.ca_chain -}}
+{{ . }}
+{{ end -}}
+{{ end -}}
 EOF
 
 cat <<EOF >/tmp/${ROLE}-cert.tpl
-{{ with secret "kubernetes/issue/${ROLE}" "common_name=${CN}" "alt_names=${ALT_NAMES}" "ip_sans=${IP_SANS}" "ttl=${TTL}" }}
-{{ .Data.certificate }}{{ end }}
+{{ with secret "kubernetes/issue/${ROLE}" "common_name=${CN}" "alt_names=${ALT_NAMES}" "ip_sans=${IP_SANS}" "ttl=${TTL}" -}}
+{{ .Data.certificate }}
+{{ end -}}
 EOF
 
 cat <<EOF >/tmp/${ROLE}-key.tpl
-{{ with secret "kubernetes/issue/${ROLE}" "common_name=${CN}" "alt_names=${ALT_NAMES}" "ip_sans=${IP_SANS}" "ttl=${TTL}" }}
-{{ .Data.private_key }}{{ end }}
+{{ with secret "kubernetes/issue/${ROLE}" "common_name=${CN}" "alt_names=${ALT_NAMES}" "ip_sans=${IP_SANS}" "ttl=${TTL}" -}}
+{{ .Data.private_key }}
+{{ end -}}
 EOF
 
 cat <<EOF >/tmp/${ROLE}.hcl

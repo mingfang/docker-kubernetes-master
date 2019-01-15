@@ -29,10 +29,10 @@ vault audit enable file file_path=/var/log/vault_audit.log
 vault secrets enable pki
 vault secrets tune -max-lease-ttl=87600h pki
 
-curl -s $VAULT_ADDR/v1/pki/ca/pem --output - > $PKI_DIR/root_cert.pem
-if [[ ! -s $PKI_DIR/root_cert.pem ]]; then
+curl -s $VAULT_ADDR/v1/pki/ca/pem --output - > $PKI_DIR/root-ca.pem
+if [[ ! -s $PKI_DIR/root-ca.pem ]]; then
   vault write pki/root/generate/internal common_name="root" ttl=87600h
-  curl -s $VAULT_ADDR/v1/pki/ca/pem --output - > $PKI_DIR/root_cert.pem
+  curl -s $VAULT_ADDR/v1/pki/ca/pem --output - > $PKI_DIR/root-ca.pem
   vault write pki/config/urls \
     issuing_certificates="http://127.0.0.1:8200/v1/pki/ca" \
     crl_distribution_points="http://127.0.0.1:8200/v1/pki/crl"
@@ -44,14 +44,15 @@ fi
 vault secrets enable -path=kubernetes pki
 vault secrets tune -max-lease-ttl=43800h kubernetes
 
-curl -s $VAULT_ADDR/v1/kubernetes/ca/pem --output - > $PKI_DIR/kubernetes_cert.pem
-if [[ ! -s $PKI_DIR/kubernetes_cert.pem ]]; then
+curl -s $VAULT_ADDR/v1/kubernetes/ca_chain --output - > $PKI_DIR/kubernetes-ca.pem
+if [[ ! -s $PKI_DIR/kubernetes-ca.pem ]]; then
   vault write -format=json kubernetes/intermediate/generate/internal \
-    common_name="kubernetes Intermediate Authority"  \
+    common_name="kubernetes-ca"  \
     | jq -r '.data.csr' > $PKI_DIR/kubernetes.csr
   vault write -format=json pki/root/sign-intermediate ttl="43800h" format=pem_bundle csr=@$PKI_DIR/kubernetes.csr \
-    | jq -r '.data.certificate' > $PKI_DIR/kubernetes_cert.pem
-  vault write kubernetes/intermediate/set-signed certificate=@$PKI_DIR/kubernetes_cert.pem
+    | jq -r '.data.certificate' > $PKI_DIR/kubernetes-ca.pem
+  cat $PKI_DIR/root-ca.pem >> $PKI_DIR/kubernetes-ca.pem
+  vault write kubernetes/intermediate/set-signed certificate=@$PKI_DIR/kubernetes-ca.pem
   rm $PKI_DIR/kubernetes.csr
 fi
 
@@ -61,14 +62,15 @@ fi
 vault secrets enable -path=cluster-signing pki
 vault secrets tune -max-lease-ttl=43800h cluster-signing
 
-curl -s $VAULT_ADDR/v1/cluster-signing/ca/pem --output - > $PKI_DIR/cluster-signing-cert.pem
-if [[ ! -s $PKI_DIR/cluster-signing-cert.pem ]]; then
+curl -s $VAULT_ADDR/v1/cluster-signing/ca_chain --output - > $PKI_DIR/cluster-signing-ca.pem
+if [[ ! -s $PKI_DIR/cluster-signing-ca.pem ]]; then
   DATA=$(vault write -format=json cluster-signing/intermediate/generate/exported common_name="cluster-signing" ttl="43800h")
   echo $DATA|jq -r '.data.csr' > $PKI_DIR/cluster-signing.csr
   echo $DATA|jq -r '.data.private_key' > $PKI_DIR/cluster-signing-key.pem
   vault write -format=json pki/root/sign-intermediate ttl="43800h" format=pem_bundle csr=@$PKI_DIR/cluster-signing.csr \
-      | jq -r '.data.certificate' > $PKI_DIR/cluster-signing-cert.pem
-  vault write cluster-signing/intermediate/set-signed certificate=@$PKI_DIR/cluster-signing-cert.pem
+      | jq -r '.data.certificate' > $PKI_DIR/cluster-signing-ca.pem
+  cat $PKI_DIR/root-ca.pem >> $PKI_DIR/cluster-signing-ca.pem
+  vault write cluster-signing/intermediate/set-signed certificate=@$PKI_DIR/cluster-signing-ca.pem
   rm $PKI_DIR/cluster-signing.csr
 fi
 
@@ -174,7 +176,7 @@ rm $PKI_DIR/CLUSTER_ADMIN_TOKEN
 
 if [ ! -f $PKI_DIR/$ROLE-key.pem ]; then
   DATA=$(vault write --format=json kubernetes/issue/$ROLE common_name=$ROLE ttl="8760h")
-  echo $DATA|jq -r .data.issuing_ca > $PKI_DIR/$ROLE-ca.pem
+  echo $DATA|jq -r .data.ca_chain > $PKI_DIR/$ROLE-ca.pem
   echo $DATA|jq -r .data.certificate > $PKI_DIR/$ROLE-cert.pem
   echo $DATA|jq -r .data.private_key > $PKI_DIR/$ROLE-key.pem
 fi
