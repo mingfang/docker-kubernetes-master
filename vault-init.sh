@@ -62,17 +62,13 @@ fi
 vault secrets enable -path=cluster-signing pki
 vault secrets tune -max-lease-ttl=43800h cluster-signing
 
-curl -s $VAULT_ADDR/v1/cluster-signing/ca_chain --output - > $PKI_DIR/cluster-signing-ca.pem
-if [[ ! -s $PKI_DIR/cluster-signing-ca.pem ]]; then
-  DATA=$(vault write -format=json cluster-signing/intermediate/generate/exported common_name="cluster-signing" ttl="43800h")
-  echo $DATA|jq -r '.data.csr' > $PKI_DIR/cluster-signing.csr
-  echo $DATA|jq -r '.data.private_key' > $PKI_DIR/cluster-signing-key.pem
-  vault write -format=json pki/root/sign-intermediate ttl="43800h" format=pem_bundle csr=@$PKI_DIR/cluster-signing.csr \
-      | jq -r '.data.certificate' > $PKI_DIR/cluster-signing-ca.pem
-  cat $PKI_DIR/root-ca.pem >> $PKI_DIR/cluster-signing-ca.pem
-  vault write cluster-signing/intermediate/set-signed certificate=@$PKI_DIR/cluster-signing-ca.pem
-  rm $PKI_DIR/cluster-signing.csr
-fi
+DATA=$(vault write -format=json cluster-signing/intermediate/generate/exported common_name="cluster-signing" ttl="43800h")
+echo $DATA|jq -r '.data.csr' > $PKI_DIR/cluster-signing.csr
+echo $DATA|jq -r '.data.private_key' > $PKI_DIR/cluster-signing-key.pem
+vault write -format=json pki/root/sign-intermediate ttl="43800h" format=pem_bundle csr=@$PKI_DIR/cluster-signing.csr \
+    | jq -r '.data.certificate' > $PKI_DIR/cluster-signing-ca.pem
+vault write cluster-signing/intermediate/set-signed certificate=@$PKI_DIR/cluster-signing-ca.pem
+rm $PKI_DIR/cluster-signing.csr
 
 # apiserver
 

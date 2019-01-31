@@ -76,6 +76,7 @@ COPY vault-init.sh /
 COPY vault.hcl /
 ENV VAULT_ADDR=http://0.0.0.0:8200
 COPY consul-template.sh /
+COPY bootstrap-tokens.sh /
 
 COPY etc/kubernetes/addons /etc/kubernetes/addons
 
