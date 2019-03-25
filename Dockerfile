@@ -50,12 +50,12 @@ RUN wget -O - https://releases.hashicorp.com/consul-template/0.19.5/consul-templ
 RUN wget -O - https://get.docker.com/builds/Linux/x86_64/docker-latest.tgz | tar zx -C /usr/local/bin --strip-components=1 docker/docker
 
 #Kubernetes
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.13.2/bin/linux/amd64/kubelet
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.13.2/bin/linux/amd64/kube-proxy
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.13.2/bin/linux/amd64/kubectl
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.13.2/bin/linux/amd64/kube-apiserver
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.13.2/bin/linux/amd64/kube-controller-manager
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.13.2/bin/linux/amd64/kube-scheduler
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.14.0/bin/linux/amd64/kubelet
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.14.0/bin/linux/amd64/kube-proxy
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.14.0/bin/linux/amd64/kubectl
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.14.0/bin/linux/amd64/kube-apiserver
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.14.0/bin/linux/amd64/kube-controller-manager
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.14.0/bin/linux/amd64/kube-scheduler
 RUN chmod +x /usr/local/bin/kube*
 
 #Etcd
@@ -67,8 +67,8 @@ RUN mkdir -p /var/lib/etcd-data
 
 
 #Addon Manager
-COPY --from=gcr.io/google-containers/kube-addon-manager:v8.9 /opt/kube-addons.sh /opt/kube-addons.sh
-COPY --from=gcr.io/google-containers/kube-addon-manager:v8.9 /opt/namespace.yaml /opt/namespace.yaml
+COPY --from=gcr.io/google-containers/kube-addon-manager:v9.0 /opt/kube-addons.sh /opt/kube-addons.sh
+COPY --from=gcr.io/google-containers/kube-addon-manager:v9.0 /opt/namespace.yaml /opt/namespace.yaml
 
 #Vault
 RUN mkdir -p /srv/kubernetes
