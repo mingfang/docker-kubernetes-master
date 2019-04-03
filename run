@@ -1,7 +1,7 @@
 #!/bin/bash
 
 NODE_NAME="${NODE_NAME:-$(hostname -s)}"
-FEATURE_GATES="PodPriority=true,PersistentLocalVolumes=true,TaintNodesByCondition=true,TaintBasedEvictions=true"
+FEATURE_GATES="CustomResourcePublishOpenAPI=true,PodPriority=true,PersistentLocalVolumes=true,TaintNodesByCondition=true,TaintBasedEvictions=true"
 
 LABELS="$LABELS,zone=master,node.kubernetes.io/master=true"
 TAINTS="node.kubernetes.io/master=:NoSchedule,CriticalAddonsOnly=:NoSchedule"
@@ -20,6 +20,8 @@ swapoff -a
 mkdir -p /local-data
 
 docker rm -f kmaster
+umount /var/lib/kubelet/volumeplugins
+
 docker run \
        --name kmaster \
        -e LABELS="$LABELS" \
