@@ -11,4 +11,8 @@ wget --backups=1 https://raw.githubusercontent.com/kubernetes/kubernetes/master/
 
 wget https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/addons/dns/coredns/coredns.yaml.sed -O coredns.yaml
 
+#rbac/kubelet-api-auth/
+wget --backups=1 https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/addons/rbac/kubelet-api-auth/kubelet-api-admin-role.yaml
+wget --backups=1 https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/addons/rbac/kubelet-api-auth/kube-apiserver-kubelet-api-admin-binding.yaml
+
 rm *1
