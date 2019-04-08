@@ -170,12 +170,10 @@ vault token create -role="cluster-admin" > $PKI_DIR/CLUSTER_ADMIN_TOKEN
 #grep "token " $PKI_DIR/CLUSTER_ADMIN_TOKEN | awk '{print $2}' | xargs vault login
 rm $PKI_DIR/CLUSTER_ADMIN_TOKEN
 
-if [ ! -f $PKI_DIR/$ROLE-key.pem ]; then
-  DATA=$(vault write --format=json kubernetes/issue/$ROLE common_name=$ROLE ttl="8760h")
-  echo $DATA|jq -r .data.ca_chain > $PKI_DIR/$ROLE-ca.pem
-  echo $DATA|jq -r .data.certificate > $PKI_DIR/$ROLE-cert.pem
-  echo $DATA|jq -r .data.private_key > $PKI_DIR/$ROLE-key.pem
-fi
+DATA=$(vault write --format=json kubernetes/issue/$ROLE common_name=$ROLE ttl="8760h")
+echo $DATA|jq -r .data.issuing_ca > $PKI_DIR/$ROLE-ca.pem
+echo $DATA|jq -r .data.certificate > $PKI_DIR/$ROLE-cert.pem
+echo $DATA|jq -r .data.private_key > $PKI_DIR/$ROLE-key.pem
 
 kubectl config set-cluster kubernetes \
     --certificate-authority=$PKI_DIR/$ROLE-ca.pem \
