@@ -4,7 +4,7 @@ source /etc/envvars
 
 export ROLE=apiserver
 export CN=kube-apiserver
-export ALT_NAMES="kube-apiserver.default,kube-apiserver.default.svc,kube-apiserver.default.svc.cluster,kube-apiserver.default.svc.cluster.local,${ALT_NAMES}"
+export ALT_NAMES="kubernetes.default,kubernetes.default.svc,kubernetes.default.svc.cluster,kubernetes.default.svc.cluster.local,${ALT_NAMES}"
 export IP_SANS="172.27.0.1"
 export TTL=8760h
 export COMMAND="sv restart apiserver"
