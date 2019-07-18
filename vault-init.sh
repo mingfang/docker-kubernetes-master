@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Allow mlock to avoid swapping Vault memory to disk
+setcap cap_ipc_lock=+ep $(readlink -f $(which vault))
+
 HEALTH_URL="$VAULT_ADDR/v1/sys/health"
 VAULT_DATA_DIR=/var/lib/vault-data
 PKI_DIR=/dev/shm/kubernetes

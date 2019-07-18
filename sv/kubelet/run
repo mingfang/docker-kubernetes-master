@@ -25,7 +25,6 @@ KUBELET_OPTS="\
 --hairpin-mode=hairpin-veth \
 --serialize-image-pulls=false \
 --node-labels=host=${HOST},${LABELS} \
---allow-privileged=false \
 --pod-manifest-path=/etc/kubernetes/manifests \
 --kube-reserved=cpu=100m,memory=100Mi \
 --system-reserved=cpu=100m,memory=100Mi \

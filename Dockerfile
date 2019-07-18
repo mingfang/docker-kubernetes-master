@@ -1,5 +1,5 @@
 FROM ubuntu:18.04 as base
-  
+
 ENV DEBIAN_FRONTEND=noninteractive TERM=xterm
 RUN echo "export > /etc/envvars" >> /root/.bashrc && \
     echo "export PS1='\[\e[1;31m\]\u@\h:\w\\$\[\e[0m\] '" | tee -a /root/.bashrc /etc/skel/.bashrc && \
@@ -37,29 +37,23 @@ RUN apt-get install -y ethtool
 #IPVS
 RUN apt-get install -y ipvsadm ipset
 
-#Vault
-RUN wget https://releases.hashicorp.com/vault/1.0.1/vault_1.0.1_linux_amd64.zip && \
-    unzip vault*.zip && \
-    rm vault*.zip && \
-    mv vault /usr/local/bin/
-
 #Consul Template
-RUN wget -O - https://releases.hashicorp.com/consul-template/0.19.5/consul-template_0.19.5_linux_amd64.tgz | tar zx -C /usr/local/bin
+RUN wget -O - https://releases.hashicorp.com/consul-template/0.20.0/consul-template_0.20.0_linux_amd64.tgz | tar zx -C /usr/local/bin
 
 #Docker client only
 RUN wget -O - https://get.docker.com/builds/Linux/x86_64/docker-latest.tgz | tar zx -C /usr/local/bin --strip-components=1 docker/docker
 
 #Kubernetes
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.14.3/bin/linux/amd64/kubelet
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.14.3/bin/linux/amd64/kube-proxy
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.14.3/bin/linux/amd64/kubectl
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.14.3/bin/linux/amd64/kube-apiserver
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.14.3/bin/linux/amd64/kube-controller-manager
-RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.14.3/bin/linux/amd64/kube-scheduler
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.15.1/bin/linux/amd64/kubelet
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.15.1/bin/linux/amd64/kube-proxy
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.15.1/bin/linux/amd64/kubectl
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.15.1/bin/linux/amd64/kube-apiserver
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.15.1/bin/linux/amd64/kube-controller-manager
+RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/release/v1.15.1/bin/linux/amd64/kube-scheduler
 RUN chmod +x /usr/local/bin/kube*
 
 #Etcd
-RUN wget -O - https://github.com/coreos/etcd/releases/download/v3.3.10/etcd-v3.3.10-linux-amd64.tar.gz | tar zx
+RUN wget -O - https://github.com/coreos/etcd/releases/download/v3.3.13/etcd-v3.3.13-linux-amd64.tar.gz | tar zx
 RUN mv /etcd* /etcd && \
     ln -s /etcd/etcd /usr/local/bin/etcd && \
     ln -s /etcd/etcdctl /usr/local/bin/etcdctl
@@ -71,6 +65,10 @@ COPY --from=gcr.io/google-containers/kube-addon-manager:v9.0.1 /opt/kube-addons.
 COPY --from=gcr.io/google-containers/kube-addon-manager:v9.0.1 /opt/namespace.yaml /opt/namespace.yaml
 
 #Vault
+RUN wget https://releases.hashicorp.com/vault/1.1.3/vault_1.1.3_linux_amd64.zip && \
+    unzip vault*.zip && \
+    rm vault*.zip && \
+    mv vault /usr/local/bin/
 RUN mkdir -p /srv/kubernetes
 COPY vault-init.sh /
 COPY vault.hcl /
@@ -81,6 +79,6 @@ COPY bootstrap-tokens.sh /
 COPY etc/kubernetes/addons /etc/kubernetes/addons
 
 # Add runit services
-COPY sv /etc/service 
+COPY sv /etc/service
 ARG BUILD_INFO
 LABEL BUILD_INFO=$BUILD_INFO
