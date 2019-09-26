@@ -6,8 +6,8 @@ metadata:
   name: coredns
   namespace: kube-system
   labels:
-    kubernetes.io/cluster-service: "true"
-    addonmanager.kubernetes.io/mode: Reconcile
+      kubernetes.io/cluster-service: "true"
+      addonmanager.kubernetes.io/mode: Reconcile
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -58,7 +58,7 @@ metadata:
   name: coredns
   namespace: kube-system
   labels:
-    addonmanager.kubernetes.io/mode: EnsureExists
+      addonmanager.kubernetes.io/mode: EnsureExists
 data:
   Corefile: |
     .:53 {
@@ -106,7 +106,7 @@ spec:
       labels:
         k8s-app: kube-dns
       annotations:
-        seccomp.security.alpha.kubernetes.io/pod: 'docker/default'
+        seccomp.security.alpha.kubernetes.io/pod: 'runtime/default'
     spec:
       affinity:
         podAntiAffinity:
@@ -121,13 +121,13 @@ spec:
       priorityClassName: system-cluster-critical
       serviceAccountName: coredns
       tolerations:
-      - key: "CriticalAddonsOnly"
-        operator: "Exists"
+        - key: "CriticalAddonsOnly"
+          operator: "Exists"
       nodeSelector:
         beta.kubernetes.io/os: linux
       containers:
       - name: coredns
-        image: k8s.gcr.io/coredns:1.5.0
+        image: k8s.gcr.io/coredns:1.6.2
         imagePullPolicy: IfNotPresent
         resources:
           limits:
@@ -174,12 +174,12 @@ spec:
           readOnlyRootFilesystem: true
       dnsPolicy: Default
       volumes:
-      - name: config-volume
-        configMap:
-          name: coredns
-          items:
-          - key: Corefile
-            path: Corefile
+        - name: config-volume
+          configMap:
+            name: coredns
+            items:
+            - key: Corefile
+              path: Corefile
 ---
 apiVersion: v1
 kind: Service

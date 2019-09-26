@@ -18,7 +18,6 @@ KUBELET_OPTS="\
 --cluster_dns=172.27.0.2 \
 --cluster-domain=cluster.local \
 --port=10250 \
---containerized=false \
 --image-gc-high-threshold=50 \
 --image-gc-low-threshold=30 \
 --registry-qps=0 \
