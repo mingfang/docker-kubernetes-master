@@ -12,7 +12,7 @@ KUBE_APISERVER_OPTS="\
 --etcd-servers=http://127.0.0.1:4001 \
 --service-cluster-ip-range=172.27.0.0/16 \
 --feature-gates=$FEATURE_GATES \
---admission-control=NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota,PodPreset,Priority \
+--enable-admission-plugins=NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota,PodPreset,Priority \
 --authorization-mode=Node,RBAC \
 --allow-privileged=true \
 --anonymous-auth=false \
@@ -34,7 +34,6 @@ KUBE_APISERVER_OPTS="\
 --storage-backend=etcd3 \
 --storage-media-type=application/json \
 --event-ttl=1h \
---enable-swagger-ui=true \
 --logtostderr=true \
 --v=1 \
 "
