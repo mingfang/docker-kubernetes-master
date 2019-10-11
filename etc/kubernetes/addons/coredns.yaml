@@ -41,7 +41,7 @@ metadata:
     rbac.authorization.kubernetes.io/autoupdate: "true"
   labels:
     kubernetes.io/bootstrapping: rbac-defaults
-    addonmanager.kubernetes.io/mode: EnsureExists
+    addonmanager.kubernetes.io/mode: Reconcile
   name: system:coredns
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -58,7 +58,7 @@ metadata:
   name: coredns
   namespace: kube-system
   labels:
-      addonmanager.kubernetes.io/mode: EnsureExists
+      addonmanager.kubernetes.io/mode: Reconcile
 data:
   Corefile: |
     .:53 {
@@ -67,6 +67,7 @@ data:
         ready
         kubernetes cluster.local in-addr.arpa ip6.arpa {
             pods insecure
+            endpoint_pod_names
             upstream
             fallthrough in-addr.arpa ip6.arpa
             ttl 30
