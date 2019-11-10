@@ -83,7 +83,7 @@ path "secret/kubernetes/service-account-key" {
   policy = "read"
 }
 EOT
-vault write auth/token/roles/apiserver orphan=true allowed_policies="kubernetes/policy/apiserver" period="1h"
+vault write auth/token/roles/apiserver orphan=true allowed_policies="kubernetes/policy/apiserver" period="24h"
 vault write kubernetes/roles/apiserver allow_any_name=true enforce_hostnames=false max_ttl="720h" generate_lease=true
 
 
@@ -98,7 +98,7 @@ path "secret/kubernetes/service-account-key" {
   policy = "read"
 }
 EOT
-vault write auth/token/roles/kubelet orphan=true allowed_policies="kubernetes/policy/kubelet" period="1h"
+vault write auth/token/roles/kubelet orphan=true allowed_policies="kubernetes/policy/kubelet" period="24h"
 vault write kubernetes/roles/kubelet organization="system:nodes" allow_any_name=true enforce_hostnames=false max_ttl="720h" generate_lease=true
 
 
@@ -112,7 +112,7 @@ path "secret/kubernetes/service-account-key" {
   policy = "read"
 }
 EOT
-vault write auth/token/roles/proxy orphan=true allowed_policies="kubernetes/policy/proxy" period="1h"
+vault write auth/token/roles/proxy orphan=true allowed_policies="kubernetes/policy/proxy" period="24h"
 vault write kubernetes/roles/proxy allow_any_name=true enforce_hostnames=false max_ttl="720h" generate_lease=true
 
 
@@ -159,7 +159,7 @@ path "secret/kubernetes/service-account-key" {
   policy = "read"
 }
 EOT
-vault write auth/token/roles/cluster-admin orphan=true allowed_policies="kubernetes/policy/cluster-admin" period="1h"
+vault write auth/token/roles/cluster-admin orphan=true allowed_policies="kubernetes/policy/cluster-admin" period="24h"
 vault write kubernetes/roles/cluster-admin organization="system:masters" allow_any_name=true enforce_hostnames=false max_ttl="8760h" generate_lease=true
 
 
