@@ -16,7 +16,7 @@ KUBE_APISERVER_OPTS="\
 --authorization-mode=Node,RBAC \
 --allow-privileged=true \
 --anonymous-auth=false \
---runtime-config="api/all,settings.k8s.io/v1alpha1,scheduling.k8s.io/v1alpha1" \
+--runtime-config="api/all=true" \
 --client-ca-file=$PKI_DIR/$ROLE-ca.pem \
 --tls-cert-file=$PKI_DIR/$ROLE-cert.pem \
 --tls-private-key-file=$PKI_DIR/$ROLE-key.pem \
