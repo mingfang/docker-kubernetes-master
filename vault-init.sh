@@ -26,6 +26,8 @@ grep "Unseal Key" $VAULT_DATA_DIR/VAULT_INIT | awk '{print $4}' | xargs -I {} va
 grep "Root Token" $VAULT_DATA_DIR/VAULT_INIT | awk '{print $4}' | xargs -I {} vault login {}
 vault audit enable file file_path=/var/log/vault_audit.log
 
+# enable KV secrets engine
+vault secrets enable -path=secret/ kv
 
 # root CA
 
