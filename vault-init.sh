@@ -141,6 +141,9 @@ path "auth/aws/login" {
 path "auth/token/lookup-self" {
   policy = "read"
 }
+path "/auth/token/*" {
+  capabilities = [ "create", "read", "update", "delete", "list", "sudo" ]
+}
 EOT
 vault write auth/aws/role/knode auth_type=ec2 bound_vpc_id="$VPC_ID" policies="aws/policy/knode,kubernetes/policy/kubelet,kubernetes/policy/proxy"
 fi
