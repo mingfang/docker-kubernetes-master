@@ -187,16 +187,16 @@ kubectl config set-cluster kubernetes \
     --certificate-authority=$PKI_DIR/$ROLE-ca.pem \
     --embed-certs=true \
     --server=$KUBERNETES_MASTER \
-    --kubeconfig=$PKI_DIR/$ROLE-kubeconfig.yml
+    --kubeconfig=$VAULT_DATA_DIR/$ROLE-kubeconfig.yml
 kubectl config set-credentials $USER \
     --client-certificate=$PKI_DIR/$ROLE-cert.pem \
     --embed-certs=true \
     --client-key=$PKI_DIR/$ROLE-key.pem \
-    --kubeconfig=$PKI_DIR/$ROLE-kubeconfig.yml
+    --kubeconfig=$VAULT_DATA_DIR/$ROLE-kubeconfig.yml
 kubectl config set-context default \
     --cluster=kubernetes \
     --user=$USER \
-    --kubeconfig=$PKI_DIR/$ROLE-kubeconfig.yml
-kubectl config use-context default --kubeconfig=$PKI_DIR/$ROLE-kubeconfig.yml
+    --kubeconfig=$VAULT_DATA_DIR/$ROLE-kubeconfig.yml
+kubectl config use-context default --kubeconfig=$VAULT_DATA_DIR/$ROLE-kubeconfig.yml
 rm $PKI_DIR/$ROLE*.pem
 
