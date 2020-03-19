@@ -3,7 +3,7 @@
 while sleep 30; do
   kubectl get node --selector='!kubernetes.io/role' --show-labels --no-headers | \
     awk '{print $1 " " $6}' | \
-    xargs --no-run-if-empty  -L 1 bash -c 'echo kubectl label node $0 kubernetes.io/role=$(echo $1 | grep -Eo "zone=\w+" | cut -d"=" -f2)' | \
+    xargs --no-run-if-empty  -L 1 bash -c 'echo kubectl label node $0 kubernetes.io/role=$(echo $1 | grep -Eo "role=\w+" | cut -d"=" -f2)' | \
     grep -E "=\w+" | \
     xargs -I {} bash -c {}
 done

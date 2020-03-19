@@ -3,7 +3,7 @@
 NODE_NAME="${NODE_NAME:-$(hostname -s)}"
 FEATURE_GATES="TaintBasedEvictions=true"
 
-LABELS="$LABELS,zone=master,node.kubernetes.io/master=true"
+LABELS="$LABELS,role=master,node.kubernetes.io/master=true"
 TAINTS="node.kubernetes.io/master=:NoSchedule,CriticalAddonsOnly=:NoSchedule"
 
 echo "KUBERNETES_MASTER=$KUBERNETES_MASTER"
