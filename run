@@ -22,6 +22,12 @@ mkdir -p /local-data
 docker rm -f kmaster
 umount /var/lib/kubelet/volumeplugins
 
+# Critical OS Settings
+sysctl -w net.ipv4.ip_forward=1
+modprobe br_netfilter
+sysctl -w net.bridge.bridge-nf-call-iptables=1
+sysctl fs.inotify.max_user_watches=524288
+
 docker run \
        --name kmaster \
        -e LABELS="$LABELS" \
@@ -31,13 +37,12 @@ docker run \
        -e REGION="$REGION" \
        -e VPC_ID="$VPC_ID" \
        -e FEATURE_GATES="$FEATURE_GATES" \
-       -e CLUSTER_CIDR="250.0.0.0/8" \
+       -e CLUSTER_CIDR="10.0.0.0/16" \
        -e ALT_NAMES="$(hostname),$(hostname -I|tr ' ' ','),$ALT_NAMES" \
        --net=host \
        --pid=host \
        --privileged=true \
        -p 10250:10250 \
-       -p 4001:4001 \
        -p 8080:8080 \
        -p 8200:8200 \
        -v /sys:/sys:rw \
@@ -48,6 +53,8 @@ docker run \
        -v /var/lib/docker/:/var/lib/docker:rw \
        -v /var/lib/kubelet/:/var/lib/kubelet:rw,shared \
        -v /var/lib/kubelet/volumeplugins:/var/lib/kubelet/volumeplugins:rw \
+       -v /var/lib/calico/:/var/lib/calico:ro \
+       -v /etc/cni/net.d:/etc/cni/net.d:ro \
        -v `pwd`/etcd-data:/var/lib/etcd-data \
        -v `pwd`/vault-data:/var/lib/vault-data \
        -v /var/log:/var/log \

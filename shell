@@ -31,7 +31,7 @@ docker run \
        -e REGION="$REGION" \
        -e VPC_ID="$VPC_ID" \
        -e FEATURE_GATES="$FEATURE_GATES" \
-       -e CLUSTER_CIDR="250.0.0.0/8" \
+       -e CLUSTER_CIDR="10.0.0.0/16" \
        -e ALT_NAMES="$(hostname),$(hostname -I|tr ' ' ','),$ALT_NAMES" \
        --net=host \
        --pid=host \

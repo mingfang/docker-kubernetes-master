@@ -37,6 +37,9 @@ KUBELET_OPTS="\
 --tls-cert-file=$PKI_DIR/$ROLE-cert.pem \
 --tls-private-key-file=$PKI_DIR/$ROLE-key.pem \
 --client-ca-file=$PKI_DIR/$ROLE-ca.pem \
+--network-plugin=cni \
+--cni-bin-dir=/rootfs/opt/cni/bin \
+--cni-conf-dir=/rootfs/etc/cni/net.d \
 --logtostderr=true \
 --v=2 \
 "
