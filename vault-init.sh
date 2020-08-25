@@ -146,6 +146,7 @@ path "/auth/token/*" {
 }
 EOT
 vault write auth/aws/role/knode auth_type=ec2 bound_vpc_id="$VPC_ID" policies="aws/policy/knode,kubernetes/policy/kubelet,kubernetes/policy/proxy"
+vault write auth/aws/config/client sts_endpoint="https://sts.$REGION.amazonaws.com"
 fi
 
 
