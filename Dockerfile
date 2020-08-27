@@ -60,7 +60,7 @@ RUN mv /etcd* /etcd && \
 RUN mkdir -p /var/lib/etcd-data
 
 #Addon Manager
-COPY --from=gcr.io/google-containers/kube-addon-manager:v9.0.2 /opt/kube-addons.sh /opt/kube-addons.sh
+COPY --from=gcr.io/google-containers/kube-addon-manager:v9.1.1 /opt/kube-addons.sh /opt/kube-addons.sh
 
 #Vault
 RUN wget https://releases.hashicorp.com/vault/1.1.3/vault_1.1.3_linux_amd64.zip && \
