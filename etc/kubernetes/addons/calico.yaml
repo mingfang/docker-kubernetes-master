@@ -2224,6 +2224,9 @@ metadata:
     controller-gen.kubebuilder.io/version: (devel)
   creationTimestamp: null
   name: kubecontrollersconfigurations.crd.projectcalico.org
+  labels:
+    kubernetes.io/cluster-service: "true"
+    addonmanager.kubernetes.io/mode: Reconcile
 spec:
   group: crd.projectcalico.org
   names:
