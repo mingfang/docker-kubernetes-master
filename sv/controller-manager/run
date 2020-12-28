@@ -8,6 +8,7 @@ export PKI_DIR=/dev/shm/kubernetes
 
 KUBE_CONTROLLER_MANAGER_OPTS="\
 --master=http://localhost:8080 \
+--use-service-account-credentials=true \
 --root-ca-file=$PKI_DIR/kubernetes-ca.pem \
 --service-account-private-key-file=$PKI_DIR/service-account-key.pem \
 --cluster-signing-cert-file=$PKI_DIR/cluster-signing-ca.pem \
