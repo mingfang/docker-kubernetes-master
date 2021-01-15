@@ -10,6 +10,7 @@ wget --backups=1 https://raw.githubusercontent.com/kubernetes/kubernetes/master/
 wget --backups=1 https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/addons/dns-horizontal-autoscaler/dns-horizontal-autoscaler.yaml
 
 wget https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/addons/dns/coredns/coredns.yaml.sed -O coredns.yaml
+#wget --backups=1 https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/addons/dns/nodelocaldns/nodelocaldns.yaml
 wget --backups=1 https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/addons/node-problem-detector/npd.yaml
 
 #rbac/kubelet-api-auth/
