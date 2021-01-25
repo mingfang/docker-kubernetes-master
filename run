@@ -2,6 +2,7 @@
 
 NODE_NAME="${NODE_NAME:-$(hostname -s)}"
 FEATURE_GATES="TaintBasedEvictions=true"
+CGROUP_DRIVER=$(docker info --format '{{print .CgroupDriver}}')
 
 LABELS="$LABELS,role=master,node.kubernetes.io/master=true"
 TAINTS="node.kubernetes.io/master=:NoSchedule,CriticalAddonsOnly=:NoSchedule"
@@ -39,6 +40,7 @@ docker run \
        -e FEATURE_GATES="$FEATURE_GATES" \
        -e CLUSTER_CIDR="10.0.0.0/16" \
        -e ALT_NAMES="$(hostname),$(hostname -I|tr ' ' ','),$ALT_NAMES" \
+       -e CGROUP_DRIVER="$CGROUP_DRIVER" \
        --net=host \
        --pid=host \
        --privileged=true \

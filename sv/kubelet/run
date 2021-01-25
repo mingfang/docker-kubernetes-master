@@ -40,6 +40,7 @@ KUBELET_OPTS="\
 --network-plugin=cni \
 --cni-bin-dir=/rootfs/opt/cni/bin \
 --cni-conf-dir=/rootfs/etc/cni/net.d \
+--cgroup-driver=$CGROUP_DRIVER \
 --logtostderr=true \
 --v=2 \
 "
