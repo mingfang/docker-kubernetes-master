@@ -2,17 +2,20 @@
 
 source /etc/envvars
 
-until curl -k -s https://localhost:6443; do echo "Waiting for API Server..."; sleep 3; done;
+until curl -k -s $KUBERNETES_MASTER; do echo "Waiting for API Server..."; sleep 3; done;
 
 export PKI_DIR=/dev/shm/kubernetes
+export ROLE=kube-controller-manager
+export USER="system:kube-controller-manager"
 
 KUBE_CONTROLLER_MANAGER_OPTS="\
---master=http://localhost:8080 \
+--master=$KUBERNETES_MASTER \
 --use-service-account-credentials=true \
 --root-ca-file=$PKI_DIR/kubernetes-ca.pem \
 --service-account-private-key-file=$PKI_DIR/service-account-key.pem \
 --cluster-signing-cert-file=$PKI_DIR/cluster-signing-ca.pem \
 --cluster-signing-key-file=$PKI_DIR/cluster-signing-key.pem \
+--kubeconfig=$PKI_DIR/$ROLE-kubeconfig.yml \
 --feature-gates=$FEATURE_GATES \
 --terminated-pod-gc-threshold 100 \
 --flex-volume-plugin-dir=/var/lib/kubelet/volumeplugins \
@@ -20,6 +23,21 @@ KUBE_CONTROLLER_MANAGER_OPTS="\
 --cluster-cidr "$CLUSTER_CIDR" \
 --logtostderr=true \
 "
+
+mkdir -p $PKI_DIR
+kubectl config set-cluster kubernetes \
+    --server=$KUBERNETES_MASTER \
+    --certificate-authority=$PKI_DIR/$ROLE-ca.pem \
+    --kubeconfig=$PKI_DIR/$ROLE-kubeconfig.yml
+kubectl config set-credentials $USER \
+    --client-certificate=$PKI_DIR/$ROLE-cert.pem \
+    --client-key=$PKI_DIR/$ROLE-key.pem \
+    --kubeconfig=$PKI_DIR/$ROLE-kubeconfig.yml
+kubectl config set-context default \
+    --cluster=kubernetes \
+    --user=$USER \
+    --kubeconfig=$PKI_DIR/$ROLE-kubeconfig.yml
+kubectl config use-context default --kubeconfig=$PKI_DIR/$ROLE-kubeconfig.yml
 
 exec 2>&1
 exec kube-controller-manager ${KUBE_CONTROLLER_MANAGER_OPTS}

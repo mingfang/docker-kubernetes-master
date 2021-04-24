@@ -89,6 +89,34 @@ vault write auth/token/roles/apiserver orphan=true allowed_policies="kubernetes/
 vault write kubernetes/roles/apiserver allow_any_name=true enforce_hostnames=false max_ttl="720h" generate_lease=true
 
 
+#kube-controller-manager
+
+cat <<EOT | vault policy write kubernetes/policy/kube-controller-manager -
+path "kubernetes/issue/kube-controller-manager" {
+  policy = "write"
+}
+
+path "secret/kubernetes/service-account-key" {
+  policy = "read"
+}
+EOT
+vault write auth/token/roles/kube-controller-manager orphan=true allowed_policies="kubernetes/policy/kube-controller-manager" period="24h"
+vault write kubernetes/roles/kube-controller-manager organization="system:kube-controller-manager" allow_any_name=true enforce_hostnames=false max_ttl="720h" generate_lease=true
+
+#kube-scheduler
+
+cat <<EOT | vault policy write kubernetes/policy/kube-scheduler -
+path "kubernetes/issue/kube-scheduler" {
+  policy = "write"
+}
+
+path "secret/kubernetes/service-account-key" {
+  policy = "read"
+}
+EOT
+vault write auth/token/roles/kube-scheduler orphan=true allowed_policies="kubernetes/policy/kube-scheduler" period="24h"
+vault write kubernetes/roles/kube-scheduler organization="system:kube-scheduler" allow_any_name=true enforce_hostnames=false max_ttl="720h" generate_lease=true
+
 #kubelet
 
 cat <<EOT | vault policy write kubernetes/policy/kubelet -
@@ -115,7 +143,7 @@ path "secret/kubernetes/service-account-key" {
 }
 EOT
 vault write auth/token/roles/proxy orphan=true allowed_policies="kubernetes/policy/proxy" period="24h"
-vault write kubernetes/roles/proxy allow_any_name=true enforce_hostnames=false max_ttl="720h" generate_lease=true
+vault write kubernetes/roles/proxy organization="system:node-proxier" allow_any_name=true enforce_hostnames=false max_ttl="720h" generate_lease=true
 
 
 #service account secret key
@@ -153,7 +181,11 @@ fi
 #tokens
 
 vault token create -role="apiserver" > $PKI_DIR/KMASTER_TOKEN
+vault token create -role="kube-controller-manager" > $PKI_DIR/KUBE_CONTROLLER_MANAGER_TOKEN
+vault token create -role="kube-scheduler" > $PKI_DIR/KUBE_SCHEDULER_TOKEN
 vault token create -role="kubelet" > $PKI_DIR/KUBELET_TOKEN
+vault token create -role="proxy" > $PKI_DIR/PROXY_TOKEN
+vault token create -role="cluster-admin" > $PKI_DIR/ADDON_MANAGER_TOKEN
 
 #cluster-admin
 

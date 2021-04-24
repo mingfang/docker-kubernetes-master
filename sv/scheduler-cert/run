@@ -1,0 +1,15 @@
+#!/bin/bash
+
+source /etc/envvars
+
+export ROLE=kube-scheduler
+export CN="system:kube-scheduler"
+export TTL=720h
+export COMMAND="sv restart scheduler"
+
+export PKI_DIR=/dev/shm/kubernetes
+export VAULT_TOKEN=${KUBE_SCHEDULER_TOKEN:-$(grep "token " $PKI_DIR/KUBE_SCHEDULER_TOKEN | awk '{print $2}')}
+rm $PKI_DIR/KUBE_SCHEDULER_TOKEN
+
+exec 2>&1
+exec /consul-template.sh

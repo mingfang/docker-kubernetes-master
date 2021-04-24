@@ -38,7 +38,6 @@ docker run \
        --privileged=true \
        -p 10250:10250 \
        -p 4001:4001 \
-       -p 8080:8080 \
        -p 8200:8200 \
        -v /sys:/sys:rw \
        -v /:/rootfs:ro \

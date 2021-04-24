@@ -2,10 +2,21 @@
 
 source /etc/envvars
 
-until curl -s http://localhost:8080; do echo "Waiting for API Server..."; sleep 3; done;
+until curl -k -s $KUBERNETES_MASTER; do echo "Waiting for API Server..."; sleep 3; done;
 
-kubectl config set-cluster local --server=http://localhost:8080
-kubectl config set-context local --cluster=local
+export PKI_DIR=/dev/shm/kubernetes
+export ROLE=cluster-admin
+export USER="cluster-admin"
+
+kubectl config set-cluster local \
+    --server=$KUBERNETES_MASTER \
+    --certificate-authority=$PKI_DIR/$ROLE-ca.pem
+kubectl config set-credentials $USER \
+    --client-certificate=$PKI_DIR/$ROLE-cert.pem \
+    --client-key=$PKI_DIR/$ROLE-key.pem
+kubectl config set-context local \
+    --cluster=local \
+    --user=$USER
 kubectl config use-context local
 
 exec 2>&1

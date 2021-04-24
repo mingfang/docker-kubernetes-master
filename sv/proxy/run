@@ -2,10 +2,10 @@
 
 source /etc/envvars
 
-until curl -k -s https://localhost:6443; do echo "Waiting for API Server..."; sleep 3; done;
+until curl -s localhost:10255/healthz; do echo "Waiting for Kubelet..."; sleep 5; done
 
 export PKI_DIR=/dev/shm/kubernetes
-export ROLE=kube-proxy
+export ROLE=proxy
 export USER=system:kube-proxy
 
 KUBE_PROXY_OPTS="\
@@ -20,7 +20,12 @@ KUBE_PROXY_OPTS="\
 
 mkdir -p $PKI_DIR
 kubectl config set-cluster kubernetes \
-    --server=http://localhost:8080 \
+    --server=$KUBERNETES_MASTER \
+    --certificate-authority=$PKI_DIR/$ROLE-ca.pem \
+    --kubeconfig=$PKI_DIR/$ROLE-kubeconfig.yml
+kubectl config set-credentials $USER \
+    --client-certificate=$PKI_DIR/$ROLE-cert.pem \
+    --client-key=$PKI_DIR/$ROLE-key.pem \
     --kubeconfig=$PKI_DIR/$ROLE-kubeconfig.yml
 kubectl config set-context default \
     --cluster=kubernetes \
