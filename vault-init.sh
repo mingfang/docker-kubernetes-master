@@ -3,6 +3,7 @@
 # Allow mlock to avoid swapping Vault memory to disk
 setcap cap_ipc_lock=+ep $(readlink -f $(which vault))
 
+KUBERNETES_MASTER="${KUBERNETES_MASTER:-https://$HOSTNAME:$SECURE_PORT}"
 HEALTH_URL="$VAULT_ADDR/v1/sys/health"
 VAULT_DATA_DIR=/var/lib/vault-data
 PKI_DIR=/dev/shm/kubernetes
@@ -60,7 +61,6 @@ if [[ ! -s $PKI_DIR/kubernetes-ca.pem ]]; then
   vault write kubernetes/intermediate/set-signed certificate=@$PKI_DIR/kubernetes-ca.pem
   rm $PKI_DIR/kubernetes.csr
 fi
-
 
 # cluster signing CA
 
@@ -145,6 +145,18 @@ EOT
 vault write auth/token/roles/proxy orphan=true allowed_policies="kubernetes/policy/proxy" period="24h"
 vault write kubernetes/roles/proxy organization="system:node-proxier" allow_any_name=true enforce_hostnames=false max_ttl="720h" generate_lease=true
 
+#cluster-admin
+
+cat <<EOT | vault policy write kubernetes/policy/cluster-admin -
+path "kubernetes/issue/cluster-admin" {
+  policy = "write"
+}
+path "secret/kubernetes/service-account-key" {
+  policy = "read"
+}
+EOT
+vault write auth/token/roles/cluster-admin orphan=true allowed_policies="kubernetes/policy/cluster-admin" period="24h"
+vault write kubernetes/roles/cluster-admin organization="system:masters" allow_any_name=true enforce_hostnames=false max_ttl="8760h" generate_lease=true
 
 #service account secret key
 
@@ -153,7 +165,6 @@ if [[ ! -s $PKI_DIR/service-account-key.pem ]]; then
   openssl genrsa 4096 | vault kv put secret/kubernetes/service-account-key key=-
   vault read -field key secret/kubernetes/service-account-key > $PKI_DIR/service-account-key.pem
 fi
-
 
 #enable AWS integration
 
@@ -178,7 +189,7 @@ vault write auth/aws/config/client sts_endpoint="https://sts.$REGION.amazonaws.c
 fi
 
 
-#tokens
+#tokens for consul template to generate certs of built-in services
 
 vault token create -role="apiserver" > $PKI_DIR/KMASTER_TOKEN
 vault token create -role="kube-controller-manager" > $PKI_DIR/KUBE_CONTROLLER_MANAGER_TOKEN
@@ -187,29 +198,9 @@ vault token create -role="kubelet" > $PKI_DIR/KUBELET_TOKEN
 vault token create -role="proxy" > $PKI_DIR/PROXY_TOKEN
 vault token create -role="cluster-admin" > $PKI_DIR/ADDON_MANAGER_TOKEN
 
-#cluster-admin
-
-cat <<EOT | vault policy write kubernetes/policy/cluster-admin -
-path "kubernetes/issue/cluster-admin" {
-  policy = "write"
-}
-path "secret/kubernetes/service-account-key" {
-  policy = "read"
-}
-EOT
-vault write auth/token/roles/cluster-admin orphan=true allowed_policies="kubernetes/policy/cluster-admin" period="24h"
-vault write kubernetes/roles/cluster-admin organization="system:masters" allow_any_name=true enforce_hostnames=false max_ttl="8760h" generate_lease=true
-
-
 #cluster-admin kubeconfig
 
-export ROLE=cluster-admin
-export USER=cluster-admin
-export KUBERNETES_MASTER="${KUBERNETES_MASTER:-https://$HOSTNAME:$SECURE_PORT}"
-
-vault token create -role="cluster-admin" > $PKI_DIR/CLUSTER_ADMIN_TOKEN
-#grep "token " $PKI_DIR/CLUSTER_ADMIN_TOKEN | awk '{print $2}' | xargs vault login
-rm $PKI_DIR/CLUSTER_ADMIN_TOKEN
+ROLE=cluster-admin
 
 DATA=$(vault write --format=json kubernetes/issue/$ROLE common_name=$ROLE ttl="8760h")
 echo $DATA|jq -r .data.issuing_ca > $PKI_DIR/$ROLE-ca.pem
@@ -221,15 +212,40 @@ kubectl config set-cluster kubernetes \
     --embed-certs=true \
     --server=$KUBERNETES_MASTER \
     --kubeconfig=$VAULT_DATA_DIR/$ROLE-kubeconfig.yml
-kubectl config set-credentials $USER \
+kubectl config set-credentials $ROLE \
     --client-certificate=$PKI_DIR/$ROLE-cert.pem \
     --embed-certs=true \
     --client-key=$PKI_DIR/$ROLE-key.pem \
     --kubeconfig=$VAULT_DATA_DIR/$ROLE-kubeconfig.yml
 kubectl config set-context default \
     --cluster=kubernetes \
-    --user=$USER \
+    --user=$ROLE \
     --kubeconfig=$VAULT_DATA_DIR/$ROLE-kubeconfig.yml
 kubectl config use-context default --kubeconfig=$VAULT_DATA_DIR/$ROLE-kubeconfig.yml
 rm $PKI_DIR/$ROLE*.pem
 
+# kubernetes auth method
+
+cat <<EOT | vault policy write kubernetes/policy/vault-agent -
+path "secret/vault-agent/*" {
+    capabilities = ["read", "list"]
+}
+# For K/V v2 secrets engine
+path "secret/data/vault-agent/*" {
+    capabilities = ["read", "list"]
+}
+EOT
+vault write auth/token/roles/vault-agent orphan=true allowed_policies="kubernetes/policy/vault-agent" period="24h"
+vault write kubernetes/roles/vault-agent allow_any_name=true enforce_hostnames=false max_ttl="8760h" generate_lease=true
+
+vault auth enable kubernetes
+vault write auth/kubernetes/config \
+    kubernetes_host=$KUBERNETES_MASTER \
+    kubernetes_ca_cert=@$PKI_DIR/kubernetes-ca.pem \
+    disable_iss_validation=true
+
+vault write auth/kubernetes/role/vault-agent \
+        bound_service_account_names='*' \
+        bound_service_account_namespaces='*' \
+        policies=kubernetes/policy/vault-agent \
+        ttl=1440h
