@@ -1,0 +1,17 @@
+#!/bin/bash
+
+source /etc/envvars
+
+until curl -k -s $KUBERNETES_MASTER; do echo "Waiting for API Server..."; sleep 3; done;
+
+export ROLE=proxy
+export CN="system:kube-proxy"
+export TTL=720h
+export COMMAND="sv restart proxy"
+
+export PKI_DIR=/dev/shm/kubernetes
+export VAULT_TOKEN=${PROXY_TOKEN:-$(grep "token " $PKI_DIR/PROXY_TOKEN | awk '{print $2}')}
+rm $PKI_DIR/PROXY_TOKEN
+
+exec 2>&1
+exec /consul-template.sh

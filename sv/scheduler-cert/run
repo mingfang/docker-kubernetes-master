@@ -2,6 +2,8 @@
 
 source /etc/envvars
 
+until curl -k -s $KUBERNETES_MASTER; do echo "Waiting for API Server..."; sleep 3; done;
+
 export ROLE=kube-scheduler
 export CN="system:kube-scheduler"
 export TTL=720h
