@@ -158,6 +158,19 @@ EOT
 vault write auth/token/roles/cluster-admin orphan=true allowed_policies="kubernetes/policy/cluster-admin" period="24h"
 vault write kubernetes/roles/cluster-admin organization="system:masters" allow_any_name=true enforce_hostnames=false max_ttl="8760h" generate_lease=true
 
+#addon-manager
+
+cat <<EOT | vault policy write kubernetes/policy/addon-manager -
+path "kubernetes/issue/addon-manager" {
+  policy = "write"
+}
+path "secret/kubernetes/service-account-key" {
+  policy = "read"
+}
+EOT
+vault write auth/token/roles/addon-manager orphan=true allowed_policies="kubernetes/policy/addon-manager" period="24h"
+vault write kubernetes/roles/addon-manager organization="system:masters" allow_any_name=true enforce_hostnames=false max_ttl="720h" generate_lease=true
+
 #service account secret key
 
 vault read -field key secret/kubernetes/service-account-key > $PKI_DIR/service-account-key.pem
@@ -196,7 +209,7 @@ vault token create -role="kube-controller-manager" > $PKI_DIR/KUBE_CONTROLLER_MA
 vault token create -role="kube-scheduler" > $PKI_DIR/KUBE_SCHEDULER_TOKEN
 vault token create -role="kubelet" > $PKI_DIR/KUBELET_TOKEN
 vault token create -role="proxy" > $PKI_DIR/PROXY_TOKEN
-vault token create -role="cluster-admin" > $PKI_DIR/ADDON_MANAGER_TOKEN
+vault token create -role="addon-manager" > $PKI_DIR/ADDON_MANAGER_TOKEN
 
 #cluster-admin kubeconfig
 

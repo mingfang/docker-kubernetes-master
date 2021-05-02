@@ -5,8 +5,8 @@ source /etc/envvars
 until curl -k -s $KUBERNETES_MASTER; do echo "Waiting for API Server..."; sleep 3; done;
 
 export PKI_DIR=/dev/shm/kubernetes
-export ROLE=cluster-admin
-export USER="cluster-admin"
+export ROLE=addon-manager
+export USER="addon-manager"
 
 kubectl config set-cluster local \
     --server=$KUBERNETES_MASTER \
