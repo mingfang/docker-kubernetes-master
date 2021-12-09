@@ -134,8 +134,12 @@ spec:
                     values: ["kube-dns"]
               topologyKey: kubernetes.io/hostname
       tolerations:
-        - key: "CriticalAddonsOnly"
-          operator: "Exists"
+        - key: CriticalAddonsOnly
+          operator: Exists
+        - key: node-role.kubernetes.io/master
+          effect: NoSchedule
+        - key: node.kubernetes.io/master
+          effect: NoSchedule
       nodeSelector:
         kubernetes.io/os: linux
       containers:
