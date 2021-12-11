@@ -19,5 +19,6 @@ kubectl config set-context local \
     --user=$USER
 kubectl config use-context local
 
+export ADDON_MANAGER_LEADER_ELECTION=false
 exec 2>&1
 exec /opt/kube-addons.sh
