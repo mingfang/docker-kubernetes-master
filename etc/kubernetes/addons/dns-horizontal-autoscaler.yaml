@@ -103,6 +103,10 @@ spec:
           - --logtostderr=true
           - --v=2
       tolerations:
-      - key: "CriticalAddonsOnly"
-        operator: "Exists"
+      - key: CriticalAddonsOnly
+        operator: Exists
+      - key: node-role.kubernetes.io/master
+        effect: NoSchedule
+      - key: node.kubernetes.io/master
+        effect: NoSchedule
       serviceAccountName: kube-dns-autoscaler
