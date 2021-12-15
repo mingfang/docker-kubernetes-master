@@ -49,6 +49,25 @@ spec:
       serviceAccountName: metrics-server
       nodeSelector:
         kubernetes.io/os: linux
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 1
+            preference:
+              matchExpressions:
+              - key: kubernetes.io/role
+                operator: In
+                values:
+                - master
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: k8s-app
+                operator: In
+                values:
+                - metrics-server
+            topologyKey: kubernetes.io/hostname
       containers:
       - name: metrics-server
         image: k8s.gcr.io/metrics-server/metrics-server:v0.5.2
