@@ -13,6 +13,7 @@ HOST=`hostname -s`
 mkdir -p /etc/kubernetes/manifests
 
 KUBELET_OPTS="\
+--provider-id=$PROVIDERID \
 --hostname_override=$NODE_NAME \
 --address=0.0.0.0 \
 --cluster_dns=172.27.0.2 \

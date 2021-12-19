@@ -9,6 +9,7 @@ CGROUP_DRIVER=$(docker info --format '{{print .CgroupDriver}}')
 LABELS="$LABELS,role=master,node.kubernetes.io/master=true"
 TAINTS="node.kubernetes.io/master=:NoSchedule,CriticalAddonsOnly=:NoSchedule"
 
+echo "PROVIDERID=$PROVIDERID"
 echo "KUBERNETES_MASTER=$KUBERNETES_MASTER"
 echo "LABELS=$LABELS"
 echo "TAINTS=$TAINTS"
@@ -33,6 +34,7 @@ sysctl fs.inotify.max_user_watches=524288
 
 docker run \
        --name kmaster \
+       -e PROVIDERID="$PROVIDERID" \
        -e LABELS="$LABELS" \
        -e TAINTS="$TAINTS" \
        -e KUBERNETES_MASTER="https://$KUBERNETES_MASTER:6443" \
