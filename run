@@ -2,7 +2,8 @@
 
 KUBERNETES_MASTER="${KUBERNETES_MASTER:-$(hostname -s)}"
 NODE_NAME="${NODE_NAME:-$(hostname -s)}"
-FEATURE_GATES=""
+CLUSTER_CIDR="${CLUSTER_CIDR:-10.0.0.0/16}"
+FEATURE_GATES="RemoveSelfLink=false"
 # use same cgroup as Docker
 CGROUP_DRIVER=$(docker info --format '{{print .CgroupDriver}}')
 
@@ -40,7 +41,7 @@ docker run \
        -e REGION="$REGION" \
        -e VPC_ID="$VPC_ID" \
        -e FEATURE_GATES="$FEATURE_GATES" \
-       -e CLUSTER_CIDR="10.0.0.0/16" \
+       -e CLUSTER_CIDR="$CLUSTER_CIDR" \
        -e ALT_NAMES="$(hostname),$(hostname -I|tr ' ' ','),$ALT_NAMES" \
        -e CGROUP_DRIVER="$CGROUP_DRIVER" \
        --net=host \
