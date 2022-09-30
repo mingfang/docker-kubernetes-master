@@ -88,7 +88,10 @@ data:
         loop
         reload
         loadbalance
-    }
+    
+        # disable ip6 response
+        rewrite stop type AAAA A
+  }
 ---
 apiVersion: apps/v1
 kind: Deployment
