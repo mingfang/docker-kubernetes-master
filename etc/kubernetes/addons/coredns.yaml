@@ -87,10 +87,7 @@ data:
         cache 30
         loop
         reload
-        loadbalance
-    
-        # disable ip6 response
-        rewrite stop type AAAA A
+        loadbalance    
     }
 ---
 apiVersion: apps/v1
