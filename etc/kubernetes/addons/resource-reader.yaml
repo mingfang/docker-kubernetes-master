@@ -7,12 +7,25 @@ metadata:
     addonmanager.kubernetes.io/mode: Reconcile
 rules:
 - apiGroups:
+  - metrics.k8s.io
+  resources:
+  - pods
+  - nodes
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - nodes/metrics
+  verbs:
+  - get
+- apiGroups:
   - ""
   resources:
   - pods
   - nodes
-  - nodes/stats
-  - namespaces
   verbs:
   - get
   - list
