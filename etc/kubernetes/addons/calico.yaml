@@ -3879,7 +3879,7 @@ spec:
               command:
               - /usr/bin/check-status
               - -r
-
+            timeoutSeconds: 10
 ---
 
 apiVersion: v1
