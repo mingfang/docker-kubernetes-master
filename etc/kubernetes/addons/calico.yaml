@@ -3735,6 +3735,7 @@ spec:
             periodSeconds: 10
             initialDelaySeconds: 10
             failureThreshold: 6
+            timeoutSeconds: 10
           readinessProbe:
             exec:
               command:
@@ -3742,6 +3743,7 @@ spec:
               - -felix-ready
               - -bird-ready
             periodSeconds: 10
+            timeoutSeconds: 10
           volumeMounts:
             - mountPath: /lib/modules
               name: lib-modules
