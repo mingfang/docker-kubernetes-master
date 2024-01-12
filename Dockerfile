@@ -1,4 +1,4 @@
-FROM ubuntu:18.04 as base
+FROM ubuntu:20.04 as base
 
 ENV DEBIAN_FRONTEND=noninteractive TERM=xterm
 RUN echo "export > /etc/envvars" >> /root/.bashrc && \
@@ -53,7 +53,7 @@ RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/rel
 RUN chmod +x /usr/local/bin/kube*
 
 #Etcd
-RUN wget -O - https://github.com/etcd-io/etcd/releases/download/v3.4.13/etcd-v3.4.13-linux-amd64.tar.gz | tar zx
+RUN wget -O - https://github.com/etcd-io/etcd/releases/download/v3.5.5/etcd-v3.5.5-linux-amd64.tar.gz | tar zx
 RUN mv /etcd* /etcd && \
     ln -s /etcd/etcd /usr/local/bin/etcd && \
     ln -s /etcd/etcdctl /usr/local/bin/etcdctl
