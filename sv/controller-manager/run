@@ -16,6 +16,8 @@ KUBE_CONTROLLER_MANAGER_OPTS="\
 --cluster-signing-cert-file=$PKI_DIR/cluster-signing-ca.pem \
 --cluster-signing-key-file=$PKI_DIR/cluster-signing-key.pem \
 --kubeconfig=$PKI_DIR/$ROLE-kubeconfig.yml \
+--authentication-kubeconfig=$PKI_DIR/$ROLE-kubeconfig.yml \
+--authorization-kubeconfig=$PKI_DIR/$ROLE-kubeconfig.yml \
 --feature-gates=$FEATURE_GATES \
 --terminated-pod-gc-threshold 100 \
 --flex-volume-plugin-dir=/var/lib/kubelet/volumeplugins \
