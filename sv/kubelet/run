@@ -38,11 +38,9 @@ KUBELET_OPTS="\
 --tls-cert-file=$PKI_DIR/$ROLE-cert.pem \
 --tls-private-key-file=$PKI_DIR/$ROLE-key.pem \
 --client-ca-file=$PKI_DIR/$ROLE-ca.pem \
---network-plugin=cni \
---cni-bin-dir=/rootfs/opt/cni/bin \
---cni-conf-dir=/rootfs/etc/cni/net.d \
 --cgroup-driver=$CGROUP_DRIVER \
---logtostderr=true \
+--container-runtime-endpoint="unix:///var/run/cri-dockerd.sock" \
+--containerd="/var/run/cri-dockerd.sock" \
 --v=2 \
 "
 

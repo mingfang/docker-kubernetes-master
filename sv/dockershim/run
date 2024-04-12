@@ -1,0 +1,4 @@
+#!/bin/bash
+
+exec 2>&1
+exec /cri-dockerd/cri-dockerd --cni-bin-dir=/rootfs/opt/cni/bin --cni-conf-dir=/rootfs/etc/cni/net.d

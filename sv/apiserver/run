@@ -35,7 +35,6 @@ KUBE_APISERVER_OPTS="\
 --storage-backend=etcd3 \
 --storage-media-type=application/json \
 --event-ttl=1h \
---logtostderr=true \
 --v=1 \
 "
 

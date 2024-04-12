@@ -21,7 +21,6 @@ KUBE_CONTROLLER_MANAGER_OPTS="\
 --flex-volume-plugin-dir=/var/lib/kubelet/volumeplugins \
 --allocate-node-cidrs=true \
 --cluster-cidr "$CLUSTER_CIDR" \
---logtostderr=true \
 "
 
 mkdir -p $PKI_DIR

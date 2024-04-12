@@ -14,7 +14,6 @@ KUBE_PROXY_OPTS="\
 --proxy-mode=ipvs \
 --feature-gates=$FEATURE_GATES \
 --kubeconfig=$PKI_DIR/$ROLE-kubeconfig.yml \
---logtostderr=true \
 --v=2 \
 "
 

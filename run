@@ -3,7 +3,7 @@
 KUBERNETES_MASTER="${KUBERNETES_MASTER:-$(hostname -s)}"
 NODE_NAME="${NODE_NAME:-$(hostname -s)}"
 CLUSTER_CIDR="${CLUSTER_CIDR:-10.0.0.0/16}"
-FEATURE_GATES="RemoveSelfLink=false"
+FEATURE_GATES="${FEATURE_GATES:-}"
 # use same cgroup as Docker
 CGROUP_DRIVER=$(docker info --format '{{print .CgroupDriver}}')
 
@@ -24,8 +24,11 @@ rpc.statd
 swapoff -a
 mkdir -p /local-data
 
+# reset
 docker rm -f kmaster
 umount /var/lib/kubelet/volumeplugins
+rm -rf /var/lib/kubelet/plugins
+rm -rf /var/lib/kubelet/plugins_registry
 
 # Critical OS Settings
 sysctl -w net.ipv4.ip_forward=1
@@ -46,6 +49,7 @@ docker run \
        -e CLUSTER_CIDR="$CLUSTER_CIDR" \
        -e ALT_NAMES="$(hostname),$(hostname -I|tr ' ' ','),$ALT_NAMES" \
        -e CGROUP_DRIVER="$CGROUP_DRIVER" \
+       -e KUBECONFIG="/var/lib/vault-data/cluster-admin-kubeconfig.yml" \
        --net=host \
        --pid=host \
        --privileged=true \

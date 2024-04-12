@@ -13,7 +13,6 @@ KUBE_SCHEDULER_OPTS="\
 --kubeconfig=$PKI_DIR/$ROLE-kubeconfig.yml \
 --feature-gates=$FEATURE_GATES \
 --policy-config-file=${SCHEDULER_POLICY_FILE} \
---logtostderr=true \
 --v=2"
 
 mkdir -p $PKI_DIR
