@@ -23,19 +23,19 @@ RUN apt-get install -y --no-install-recommends iptables conntrack
 RUN apt-get install -y --no-install-recommends zfsutils-linux
 
 #NFS client
-RUN apt-get install -y nfs-common
+RUN apt-get install -y --no-install-recommends nfs-common
 
 #XFS
-RUN apt-get install -y libguestfs-xfs
+RUN apt-get install -y --no-install-recommends libguestfs-xfs
 
 #Ceph client
-RUN apt-get install -y ceph-common
+RUN apt-get install -y --no-install-recommends ceph-common
 
 #For Hairpin-veth mode
-RUN apt-get install -y ethtool
+RUN apt-get install -y --no-install-recommends ethtool
 
 #IPVS
-RUN apt-get install -y ipvsadm ipset
+RUN apt-get install -y --no-install-recommends ipvsadm ipset
 
 #Consul Template
 RUN wget -O - https://releases.hashicorp.com/consul-template/0.20.0/consul-template_0.20.0_linux_amd64.tgz | tar zx -C /usr/local/bin
@@ -57,7 +57,7 @@ RUN wget -P /usr/local/bin https://storage.googleapis.com/kubernetes-release/rel
 RUN chmod +x /usr/local/bin/kube*
 
 #Etcd
-RUN wget -O - https://github.com/etcd-io/etcd/releases/download/v3.5.5/etcd-v3.5.5-linux-amd64.tar.gz | tar zx
+RUN wget -O - https://github.com/etcd-io/etcd/releases/download/v3.5.11/etcd-v3.5.11-linux-amd64.tar.gz | tar zx
 RUN mv /etcd* /etcd && \
     ln -s /etcd/etcd /usr/local/bin/etcd && \
     ln -s /etcd/etcdctl /usr/local/bin/etcdctl
