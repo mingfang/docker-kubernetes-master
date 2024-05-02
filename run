@@ -27,8 +27,6 @@ mkdir -p /local-data
 # reset
 docker rm -f kmaster
 umount /var/lib/kubelet/volumeplugins
-rm -rf /var/lib/kubelet/plugins
-rm -rf /var/lib/kubelet/plugins_registry
 
 # Critical OS Settings
 sysctl -w net.ipv4.ip_forward=1
