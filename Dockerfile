@@ -67,7 +67,7 @@ RUN mkdir -p /var/lib/etcd-data
 COPY --from=gcr.io/google-containers/kube-addon-manager:v9.1.1 /opt/kube-addons.sh /opt/kube-addons.sh
 
 #Vault
-RUN wget https://releases.hashicorp.com/vault/1.7.1/vault_1.7.1_linux_amd64.zip && \
+RUN wget https://releases.hashicorp.com/vault/1.18.5/vault_1.18.5_linux_amd64.zip && \
     unzip vault*.zip && \
     rm vault*.zip && \
     mv vault /usr/local/bin/
@@ -84,4 +84,3 @@ COPY etc/kubernetes/addons /etc/kubernetes/addons
 COPY sv /etc/service
 ARG BUILD_INFO
 LABEL BUILD_INFO=$BUILD_INFO
-
