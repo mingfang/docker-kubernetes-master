@@ -4,6 +4,7 @@
 setcap cap_ipc_lock=+ep $(readlink -f $(which vault))
 
 KUBERNETES_MASTER="${KUBERNETES_MASTER:-https://$HOSTNAME:$SECURE_PORT}"
+VAULT_ADDR="${VAULT_ADDR:-http://127.0.0.1:8200}"
 HEALTH_URL="$VAULT_ADDR/v1/sys/health"
 VAULT_DATA_DIR=/var/lib/vault-data
 PKI_DIR=/dev/shm/kubernetes
@@ -14,9 +15,9 @@ mkdir -p $PKI_DIR
 if ! curl -s $HEALTH_URL; then
   vault server -config=/vault.hcl&
 fi
-until curl -s $HEALTH_URL; do echo "Waiting for Vault..."; sleep 3; done
+until curl -s $HEALTH_URL; do echo "Waiting for Vault...${VAULT_ADDR}"; sleep 3; done
 
-if [ ! "$(ls $VAULT_DATA_DIR)" ]; then
+if [ ! "$(ls $VAULT_DATA_DIR/VAULT_INIT)" ]; then
     vault operator init > $VAULT_DATA_DIR/VAULT_INIT
 fi
 
@@ -33,11 +34,12 @@ vault secrets enable -path=secret/ kv
 # root CA
 
 vault secrets enable pki
-vault secrets tune -max-lease-ttl=87600h pki
+vault secrets tune -max-lease-ttl=876000h pki
+vault read sys/mounts/pki/tune
 
 curl -s $VAULT_ADDR/v1/pki/ca/pem --output - > $PKI_DIR/root-ca.pem
 if [[ ! -s $PKI_DIR/root-ca.pem ]]; then
-  vault write pki/root/generate/internal common_name="root" ttl=87600h
+  vault write pki/root/generate/internal common_name="root" issuer_name="root-$(date +"%Y%m%d-%H%M%S%Z")" ttl="876000h"
   curl -s $VAULT_ADDR/v1/pki/ca/pem --output - > $PKI_DIR/root-ca.pem
   vault write pki/config/urls \
     issuing_certificates="http://127.0.0.1:8200/v1/pki/ca" \
@@ -48,32 +50,31 @@ fi
 # intermediate CA
 
 vault secrets enable -path=kubernetes pki
-vault secrets tune -max-lease-ttl=43800h kubernetes
+vault secrets tune -max-lease-ttl=87600h kubernetes
+vault read sys/mounts/kubernetes/tune
 
-curl -s $VAULT_ADDR/v1/kubernetes/ca_chain --output - > $PKI_DIR/kubernetes-ca.pem
-if [[ ! -s $PKI_DIR/kubernetes-ca.pem ]]; then
-  vault write -format=json kubernetes/intermediate/generate/internal \
-    common_name="kubernetes-ca"  \
-    | jq -r '.data.csr' > $PKI_DIR/kubernetes.csr
-  vault write -format=json pki/root/sign-intermediate ttl="43800h" format=pem_bundle csr=@$PKI_DIR/kubernetes.csr \
-    | jq -r '.data.certificate' > $PKI_DIR/kubernetes-ca.pem
-  cat $PKI_DIR/root-ca.pem >> $PKI_DIR/kubernetes-ca.pem
-  vault write kubernetes/intermediate/set-signed certificate=@$PKI_DIR/kubernetes-ca.pem
-  rm $PKI_DIR/kubernetes.csr
-fi
+DATA=$(vault write -format=json kubernetes/intermediate/generate/exported common_name="kubernetes-ca")
+echo $DATA | jq -r '.data.csr' > $PKI_DIR/kubernetes.csr
+vault write -format=json pki/root/sign-intermediate format=pem_bundle csr=@$PKI_DIR/kubernetes.csr ttl="8761h" \
+  | jq -r '.data.certificate' > $PKI_DIR/kubernetes-ca.pem
+rm $PKI_DIR/kubernetes.csr
+vault write kubernetes/intermediate/set-signed certificate=@$PKI_DIR/kubernetes-ca.pem
+vault write kubernetes/config/urls \
+  issuing_certificates="http://127.0.0.1:8200/v1/kubernetes/ca" \
+  crl_distribution_points="http://127.0.0.1:8200/v1/kubernetes/crl"
+
+# set default issuer using serial number then key. maybe there's a better way
+SERIAL=$(openssl x509 -in $PKI_DIR/kubernetes-ca.pem -text | grep -A1 "Serial Number" | tail -1)
+KEY=$(vault list -detailed kubernetes/issuers | grep $SERIAL | awk '{print $1}')
+vault write kubernetes/issuer/$KEY issuer_name="kubernetes-ca-$(date +"%Y%m%d-%H%M%S%Z")"
+vault write kubernetes/config/issuers default=$KEY
 
 # cluster signing CA
+# reuse kubernetes-ca
+# kubernetes-ca.pem is a chain. only use the first cert. https://github.com/kubernetes/kubeadm/issues/1350
+(openssl x509) < $PKI_DIR/kubernetes-ca.pem > $PKI_DIR/cluster-signing-ca.pem
+echo $DATA | jq -r '.data.private_key' > $PKI_DIR/cluster-signing-key.pem
 
-vault secrets enable -path=cluster-signing pki
-vault secrets tune -max-lease-ttl=43800h cluster-signing
-
-DATA=$(vault write -format=json cluster-signing/intermediate/generate/exported common_name="cluster-signing" ttl="43800h")
-echo $DATA|jq -r '.data.csr' > $PKI_DIR/cluster-signing.csr
-echo $DATA|jq -r '.data.private_key' > $PKI_DIR/cluster-signing-key.pem
-vault write -format=json pki/root/sign-intermediate ttl="43800h" format=pem_bundle csr=@$PKI_DIR/cluster-signing.csr \
-    | jq -r '.data.certificate' > $PKI_DIR/cluster-signing-ca.pem
-vault write cluster-signing/intermediate/set-signed certificate=@$PKI_DIR/cluster-signing-ca.pem
-rm $PKI_DIR/cluster-signing.csr
 
 # apiserver
 
