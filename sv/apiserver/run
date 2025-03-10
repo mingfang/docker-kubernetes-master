@@ -39,7 +39,5 @@ KUBE_APISERVER_OPTS="\
 --v=1 \
 "
 
-/vault-init.sh
-
 exec 2>&1
 exec kube-apiserver ${KUBE_APISERVER_OPTS}

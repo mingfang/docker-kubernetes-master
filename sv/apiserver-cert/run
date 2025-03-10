@@ -2,6 +2,9 @@
 
 source /etc/envvars
 
+# MUST START VAULT HERE!
+/vault-init.sh
+
 export ROLE=apiserver
 export CN=kube-apiserver
 export ALT_NAMES="kubernetes.default,kubernetes.default.svc,kubernetes.default.svc.cluster,kubernetes.default.svc.cluster.local,${ALT_NAMES}"
