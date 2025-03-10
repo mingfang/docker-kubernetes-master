@@ -217,7 +217,7 @@ vault token create -role="addon-manager" > $PKI_DIR/ADDON_MANAGER_TOKEN
 ROLE=cluster-admin
 
 DATA=$(vault write --format=json kubernetes/issue/$ROLE common_name=$ROLE ttl="8760h")
-echo $DATA|jq -r .data.issuing_ca > $PKI_DIR/$ROLE-ca.pem
+echo $DATA|jq -r .data.ca_chain[] > $PKI_DIR/$ROLE-ca.pem
 echo $DATA|jq -r .data.certificate > $PKI_DIR/$ROLE-cert.pem
 echo $DATA|jq -r .data.private_key > $PKI_DIR/$ROLE-key.pem
 
