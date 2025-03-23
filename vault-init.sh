@@ -33,11 +33,11 @@ vault secrets enable -path=secret/ kv
 # root CA
 
 vault secrets enable pki
-vault secrets tune -max-lease-ttl=87600h pki
+vault secrets tune -max-lease-ttl=876000h pki
 
 curl -s $VAULT_ADDR/v1/pki/ca/pem --output - > $PKI_DIR/root-ca.pem
 if [[ ! -s $PKI_DIR/root-ca.pem ]]; then
-  vault write pki/root/generate/internal common_name="root" ttl=87600h
+  vault write pki/root/generate/internal common_name="root" ttl=876000h
   curl -s $VAULT_ADDR/v1/pki/ca/pem --output - > $PKI_DIR/root-ca.pem
   vault write pki/config/urls \
     issuing_certificates="http://127.0.0.1:8200/v1/pki/ca" \
@@ -48,14 +48,14 @@ fi
 # intermediate CA
 
 vault secrets enable -path=kubernetes pki
-vault secrets tune -max-lease-ttl=43800h kubernetes
+vault secrets tune -max-lease-ttl=87600h kubernetes
 
 curl -s $VAULT_ADDR/v1/kubernetes/ca_chain --output - > $PKI_DIR/kubernetes-ca.pem
 if [[ ! -s $PKI_DIR/kubernetes-ca.pem ]]; then
   vault write -format=json kubernetes/intermediate/generate/internal \
     common_name="kubernetes-ca"  \
     | jq -r '.data.csr' > $PKI_DIR/kubernetes.csr
-  vault write -format=json pki/root/sign-intermediate ttl="43800h" format=pem_bundle csr=@$PKI_DIR/kubernetes.csr \
+  vault write -format=json pki/root/sign-intermediate ttl="87600h" format=pem_bundle csr=@$PKI_DIR/kubernetes.csr \
     | jq -r '.data.certificate' > $PKI_DIR/kubernetes-ca.pem
   cat $PKI_DIR/root-ca.pem >> $PKI_DIR/kubernetes-ca.pem
   vault write kubernetes/intermediate/set-signed certificate=@$PKI_DIR/kubernetes-ca.pem
@@ -65,12 +65,12 @@ fi
 # cluster signing CA
 
 vault secrets enable -path=cluster-signing pki
-vault secrets tune -max-lease-ttl=43800h cluster-signing
+vault secrets tune -max-lease-ttl=87600h cluster-signing
 
-DATA=$(vault write -format=json cluster-signing/intermediate/generate/exported common_name="cluster-signing" ttl="43800h")
+DATA=$(vault write -format=json cluster-signing/intermediate/generate/exported common_name="cluster-signing" ttl="87600h")
 echo $DATA|jq -r '.data.csr' > $PKI_DIR/cluster-signing.csr
 echo $DATA|jq -r '.data.private_key' > $PKI_DIR/cluster-signing-key.pem
-vault write -format=json pki/root/sign-intermediate ttl="43800h" format=pem_bundle csr=@$PKI_DIR/cluster-signing.csr \
+vault write -format=json pki/root/sign-intermediate ttl="87600h" format=pem_bundle csr=@$PKI_DIR/cluster-signing.csr \
     | jq -r '.data.certificate' > $PKI_DIR/cluster-signing-ca.pem
 vault write cluster-signing/intermediate/set-signed certificate=@$PKI_DIR/cluster-signing-ca.pem
 rm $PKI_DIR/cluster-signing.csr
