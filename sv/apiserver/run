@@ -5,6 +5,8 @@ source /etc/envvars
 export PKI_DIR=/dev/shm/kubernetes
 export ROLE=apiserver
 export SECURE_PORT=6443
+export API_AUDIENCES="${API_AUDIENCES:-https://kubernetes.default.svc}"
+export SERVICE_ACCOUNT_ISSUER="${SERVICE_ACCOUNT_ISSUER:-https://kubernetes.default.svc}"
 
 KUBE_APISERVER_OPTS="\
 --secure-port=$SECURE_PORT \

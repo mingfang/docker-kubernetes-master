@@ -5,10 +5,6 @@ NODE_NAME="${NODE_NAME:-$(hostname -s)}"
 CLUSTER_CIDR="${CLUSTER_CIDR:-10.0.0.0/16}"
 FEATURE_GATES="${FEATURE_GATES:-}"
 
-# set these 2 when using AWS IRSA
-API_AUDIENCES="${API_AUDIENCES:-https://kubernetes.default.svc}"
-SERVICE_ACCOUNT_ISSUER="${SERVICE_ACCOUNT_ISSUER-https://kubernetes.default.svc}"
-
 # use same cgroup as Docker
 CGROUP_DRIVER=$(docker info --format '{{print .CgroupDriver}}')
 
@@ -53,6 +49,8 @@ docker run \
        -e ALT_NAMES="localhost,$(hostname),$(hostname -I|tr ' ' ','),$ALT_NAMES" \
        -e CGROUP_DRIVER="$CGROUP_DRIVER" \
        -e KUBECONFIG="/var/lib/vault-data/cluster-admin-kubeconfig.yml" \
+       -e API_AUDIENCES="$API_AUDIENCES" \
+       -e SERVICE_ACCOUNT_ISSUER="$SERVICE_ACCOUNT_ISSUER" \
        --net=host \
        --pid=host \
        --privileged=true \
