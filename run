@@ -3,7 +3,12 @@
 KUBERNETES_MASTER="${KUBERNETES_MASTER:-$(hostname -s)}"
 NODE_NAME="${NODE_NAME:-$(hostname -s)}"
 CLUSTER_CIDR="${CLUSTER_CIDR:-10.0.0.0/16}"
-FEATURE_GATES="RemoveSelfLink=false"
+FEATURE_GATES="${FEATURE_GATES:-}"
+
+# set these 2 when using AWS IRSA
+API_AUDIENCES="${API_AUDIENCES:-https://kubernetes.default.svc}"
+SERVICE_ACCOUNT_ISSUER="${SERVICE_ACCOUNT_ISSUER-https://kubernetes.default.svc}"
+
 # use same cgroup as Docker
 CGROUP_DRIVER=$(docker info --format '{{print .CgroupDriver}}')
 
@@ -24,6 +29,7 @@ rpc.statd
 swapoff -a
 mkdir -p /local-data
 
+# reset
 docker rm -f kmaster
 umount /var/lib/kubelet/volumeplugins
 
@@ -44,8 +50,9 @@ docker run \
        -e VPC_ID="$VPC_ID" \
        -e FEATURE_GATES="$FEATURE_GATES" \
        -e CLUSTER_CIDR="$CLUSTER_CIDR" \
-       -e ALT_NAMES="$(hostname),$(hostname -I|tr ' ' ','),$ALT_NAMES" \
+       -e ALT_NAMES="localhost,$(hostname),$(hostname -I|tr ' ' ','),$ALT_NAMES" \
        -e CGROUP_DRIVER="$CGROUP_DRIVER" \
+       -e KUBECONFIG="/var/lib/vault-data/cluster-admin-kubeconfig.yml" \
        --net=host \
        --pid=host \
        --privileged=true \

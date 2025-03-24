@@ -19,8 +19,9 @@ KUBE_APISERVER_OPTS="\
 --client-ca-file=$PKI_DIR/$ROLE-ca.pem \
 --tls-cert-file=$PKI_DIR/$ROLE-cert.pem \
 --tls-private-key-file=$PKI_DIR/$ROLE-key.pem \
+--api-audiences=$API_AUDIENCES \
+--service-account-issuer=$SERVICE_ACCOUNT_ISSUER \
 --service-account-key-file=$PKI_DIR/service-account-key.pem \
---service-account-issuer=https://kubernetes.default.svc \
 --service-account-signing-key-file=$PKI_DIR/service-account-key.pem \
 --requestheader-client-ca-file=$PKI_DIR/$ROLE-ca.pem \
 --requestheader-allowed-names= \
@@ -35,7 +36,6 @@ KUBE_APISERVER_OPTS="\
 --storage-backend=etcd3 \
 --storage-media-type=application/json \
 --event-ttl=1h \
---logtostderr=true \
 --v=1 \
 "
 
